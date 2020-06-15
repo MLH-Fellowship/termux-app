@@ -8,6 +8,8 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.termux.terminal.KeyHandler;
 import com.termux.terminal.TerminalEmulator;
 import com.termux.terminal.TerminalSession;
@@ -15,13 +17,13 @@ import com.termux.view.TerminalViewClient;
 
 import java.util.List;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
 public final class TermuxViewClient implements TerminalViewClient {
 
     final TermuxActivity mActivity;
 
-    /** Keeping track of the special keys acting as Ctrl and Fn for the soft keyboard and other hardware keys. */
+    /**
+     * Keeping track of the special keys acting as Ctrl and Fn for the soft keyboard and other hardware keys.
+     */
     boolean mVirtualControlKeyDown, mVirtualFnKeyDown;
 
     public TermuxViewClient(TermuxActivity activity) {
@@ -261,7 +263,9 @@ public final class TermuxViewClient implements TerminalViewClient {
         return false;
     }
 
-    /** Handle dedicated volume buttons as virtual keys if applicable. */
+    /**
+     * Handle dedicated volume buttons as virtual keys if applicable.
+     */
     private boolean handleVirtualKeys(int keyCode, KeyEvent event, boolean down) {
         InputDevice inputDevice = event.getDevice();
         if (mActivity.mSettings.mDisableVolumeVirtualKeys) {

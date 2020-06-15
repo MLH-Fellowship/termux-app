@@ -12,10 +12,6 @@ import android.widget.LinearLayout;
 
 public final class DialogUtils {
 
-    public interface TextSetListener {
-        void onTextSet(String text);
-    }
-
     public static void textInput(Activity activity, int titleText, String initialText,
                                  int positiveButtonText, final TextSetListener onPositive,
                                  int neutralButtonText, final TextSetListener onNeutral,
@@ -66,6 +62,10 @@ public final class DialogUtils {
         dialogHolder[0] = builder.create();
         dialogHolder[0].setCanceledOnTouchOutside(false);
         dialogHolder[0].show();
+    }
+
+    public interface TextSetListener {
+        void onTextSet(String text);
     }
 
 }

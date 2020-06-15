@@ -11,7 +11,9 @@ import java.util.Properties;
  */
 public final class TerminalColorScheme {
 
-    /** http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg, but with blue color brighter. */
+    /**
+     * http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg, but with blue color brighter.
+     */
     private static final int[] DEFAULT_COLORSCHEME = {
         // 16 original colors. First 8 are dim.
         0xff000000, // black

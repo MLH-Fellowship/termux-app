@@ -17,16 +17,16 @@ import java.util.Properties;
 /**
  * When allow-external-apps property is set to "true", Termux is able to process execute intents
  * sent by third-party applications.
- *
+ * <p>
  * Third-party program must declare com.termux.permission.RUN_COMMAND permission and it should be
  * granted by user.
- *
+ * <p>
  * Sample code to run command "top":
- *   Intent intent = new Intent();
- *   intent.setClassName("com.termux", "com.termux.app.RunCommandService");
- *   intent.setAction("com.termux.RUN_COMMAND");
- *   intent.putExtra("com.termux.RUN_COMMAND_PATH", "/data/data/com.termux/files/usr/bin/top");
- *   startService(intent);
+ * Intent intent = new Intent();
+ * intent.setClassName("com.termux", "com.termux.app.RunCommandService");
+ * intent.setAction("com.termux.RUN_COMMAND");
+ * intent.putExtra("com.termux.RUN_COMMAND_PATH", "/data/data/com.termux/files/usr/bin/top");
+ * startService(intent);
  */
 public class RunCommandService extends Service {
 
@@ -34,11 +34,6 @@ public class RunCommandService extends Service {
     public static final String RUN_COMMAND_PATH = "com.termux.RUN_COMMAND_PATH";
     public static final String RUN_COMMAND_ARGUMENTS = "com.termux.RUN_COMMAND_ARGUMENTS";
     public static final String RUN_COMMAND_WORKDIR = "com.termux.RUN_COMMAND_WORKDIR";
-
-    class LocalBinder extends Binder {
-        public final RunCommandService service = RunCommandService.this;
-    }
-
     private final IBinder mBinder = new RunCommandService.LocalBinder();
 
     @Override
@@ -82,5 +77,9 @@ public class RunCommandService extends Service {
         }
 
         return props.getProperty("allow-external-apps", "false").equals("true");
+    }
+
+    class LocalBinder extends Binder {
+        public final RunCommandService service = RunCommandService.this;
     }
 }

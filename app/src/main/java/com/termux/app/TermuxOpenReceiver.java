@@ -14,13 +14,13 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import androidx.annotation.NonNull;
+
 import com.termux.terminal.EmulatorDebug;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import androidx.annotation.NonNull;
 
 public class TermuxOpenReceiver extends BroadcastReceiver {
 
@@ -129,7 +129,7 @@ public class TermuxOpenReceiver extends BroadcastReceiver {
             Object[] row = new Object[projection.length];
             for (int i = 0; i < projection.length; i++) {
                 String column = projection[i];
-                Object value;
+                java.io.Serializable value;
                 switch (column) {
                     case MediaStore.MediaColumns.DISPLAY_NAME:
                         value = file.getName();

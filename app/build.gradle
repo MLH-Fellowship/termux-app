@@ -1,5 +1,5 @@
 plugins {
-  id "com.android.application"
+    id "com.android.application"
 }
 
 android {
@@ -77,9 +77,9 @@ dependencies {
 }
 
 task versionName {
-  doLast {
-    print android.defaultConfig.versionName
-  }
+    doLast {
+        print android.defaultConfig.versionName
+    }
 }
 
 def downloadBootstrap(String arch, String expectedChecksum, int version) {
@@ -131,18 +131,18 @@ clean {
     }
 }
 
-task downloadBootstraps(){
+task downloadBootstraps() {
     doLast {
         def version = 25
         downloadBootstrap("aarch64", "633baa1f7edfd81f6064338a68d1149aa203d4b24cbc4f7c64283aaca109609e", version)
-        downloadBootstrap("arm",     "a581a22e0d79a0e8cef9395b1bd951ba066ac2d688522e17cca0b3e1c0649daa", version)
-        downloadBootstrap("i686",    "8288e13f0a6ddeb2ff9406d8f968a8930a58e9318d09fadb2b7c8970a034cfdc", version)
-        downloadBootstrap("x86_64",  "c99b80a18d6bbb64c24c5a64d6ee6b8d4306729ebd172662b807bcb4a46dd39a", version)
+        downloadBootstrap("arm", "a581a22e0d79a0e8cef9395b1bd951ba066ac2d688522e17cca0b3e1c0649daa", version)
+        downloadBootstrap("i686", "8288e13f0a6ddeb2ff9406d8f968a8930a58e9318d09fadb2b7c8970a034cfdc", version)
+        downloadBootstrap("x86_64", "c99b80a18d6bbb64c24c5a64d6ee6b8d4306729ebd172662b807bcb4a46dd39a", version)
     }
 }
 
 afterEvaluate {
-  android.applicationVariants.all { variant ->
-    variant.javaCompileProvider.get().dependsOn(downloadBootstraps)
-  }
+    android.applicationVariants.all { variant ->
+        variant.javaCompileProvider.get().dependsOn(downloadBootstraps)
+    }
 }

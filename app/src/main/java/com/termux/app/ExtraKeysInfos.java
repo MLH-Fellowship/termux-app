@@ -8,95 +8,9 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ExtraKeysInfos {
-
-    /**
-     * Matrix of buttons displayed
-     */
-    private ExtraKeyButton[][] buttons;
-
-    /**
-     * This corresponds to one of the CharMapDisplay below
-     */
-    private String style = "default";
-
-    public ExtraKeysInfos(String propertiesInfo, String style) throws JSONException {
-        this.style = style;
-
-        // Convert String propertiesInfo to Array of Arrays
-        JSONArray arr = new JSONArray(propertiesInfo);
-        Object[][] matrix = new Object[arr.length()][];
-        for (int i = 0; i < arr.length(); i++) {
-            JSONArray line = arr.getJSONArray(i);
-            matrix[i] = new Object[line.length()];
-            for (int j = 0; j < line.length(); j++) {
-                matrix[i][j] = line.get(j);
-            }
-        }
-
-        // convert matrix to buttons
-        this.buttons = new ExtraKeyButton[matrix.length][];
-        for (int i = 0; i < matrix.length; i++) {
-            this.buttons[i] = new ExtraKeyButton[matrix[i].length];
-            for (int j = 0; j < matrix[i].length; j++) {
-                Object key = matrix[i][j];
-
-                JSONObject jobject = normalizeKeyConfig(key);
-
-                ExtraKeyButton button;
-
-                if(! jobject.has("popup")) {
-                    // no popup
-                    button = new ExtraKeyButton(getSelectedCharMap(), jobject);
-                } else {
-                    // a popup
-                    JSONObject popupJobject = normalizeKeyConfig(jobject.get("popup"));
-                    ExtraKeyButton popup = new ExtraKeyButton(getSelectedCharMap(), popupJobject);
-                    button = new ExtraKeyButton(getSelectedCharMap(), jobject, popup);
-                }
-
-                this.buttons[i][j] = button;
-            }
-        }
-    }
-
-    /**
-     * "hello" -> {"key": "hello"}
-     */
-    private static JSONObject normalizeKeyConfig(Object key) throws JSONException {
-        JSONObject jobject;
-        if(key instanceof String) {
-            jobject = new JSONObject();
-            jobject.put("key", key);
-        } else if(key instanceof JSONObject) {
-            jobject = (JSONObject) key;
-        } else {
-            throw new JSONException("An key in the extra-key matrix must be a string or an object");
-        }
-        return jobject;
-    }
-
-    public ExtraKeyButton[][] getMatrix() {
-        return buttons;
-    }
-
-    /**
-     * HashMap that implements Python dict.get(key, default) function.
-     * Default java.util .get(key) is then the same as .get(key, null);
-     */
-    static class CleverMap<K,V> extends HashMap<K,V> {
-        V get(K key, V defaultValue) {
-            if(containsKey(key))
-                return get(key);
-            else
-                return defaultValue;
-        }
-    }
-
-    static class CharDisplayMap extends CleverMap<String, String> {}
 
     /**
      * Keys are displayed in a natural looking way, like "→" for "RIGHT"
@@ -108,7 +22,6 @@ public class ExtraKeysInfos {
         put("UP", "↑"); // U+2191 ↑ UPWARDS ARROW
         put("DOWN", "↓"); // U+2193 ↓ DOWNWARDS ARROW
     }};
-
     static final CharDisplayMap wellKnownCharactersDisplay = new CharDisplayMap() {{
         // well known characters // https://en.wikipedia.org/wiki/{Enter_key, Tab_key, Delete_key}
         put("ENTER", "↲"); // U+21B2 ↲ DOWNWARDS ARROW WITH TIP LEFTWARDS
@@ -118,7 +31,6 @@ public class ExtraKeysInfos {
         put("DRAWER", "☰"); // U+2630 ☰ TRIGRAM FOR HEAVEN not well known but easy to understand
         put("KEYBOARD", "⌨"); // U+2328 ⌨ KEYBOARD not well known but easy to understand
     }};
-
     static final CharDisplayMap lessKnownCharactersDisplay = new CharDisplayMap() {{
         // https://en.wikipedia.org/wiki/{Home_key, End_key, Page_Up_and_Page_Down_keys}
         // home key can mean "goto the beginning of line" or "goto first page" depending on context, hence the diagonal
@@ -127,7 +39,6 @@ public class ExtraKeysInfos {
         put("PGUP", "⇑"); // no ISO character exists, U+21D1 ⇑ UPWARDS DOUBLE ARROW will do the trick
         put("PGDN", "⇓"); // no ISO character exists, U+21D3 ⇓ DOWNWARDS DOUBLE ARROW will do the trick
     }};
-
     static final CharDisplayMap arrowTriangleVariationDisplay = new CharDisplayMap() {{
         // alternative to classic arrow keys
         put("LEFT", "◀"); // U+25C0 ◀ BLACK LEFT-POINTING TRIANGLE
@@ -135,7 +46,6 @@ public class ExtraKeysInfos {
         put("UP", "▲"); // U+25B2 ▲ BLACK UP-POINTING TRIANGLE
         put("DOWN", "▼"); // U+25BC ▼ BLACK DOWN-POINTING TRIANGLE
     }};
-
     static final CharDisplayMap notKnownIsoCharacters = new CharDisplayMap() {{
         // Control chars that are more clear as text // https://en.wikipedia.org/wiki/{Function_key, Alt_key, Control_key, Esc_key}
         // put("FN", "FN"); // no ISO character exists
@@ -143,17 +53,10 @@ public class ExtraKeysInfos {
         put("ALT", "⎇"); // ISO character "U+2387 ⎇ ALTERNATIVE KEY SYMBOL'" is unknown to people and only printed as the Option key "⌥" on Mac computer
         put("ESC", "⎋"); // ISO character "U+238B ⎋ BROKEN CIRCLE WITH NORTHWEST ARROW" is unknown to people and not often printed on computers
     }};
-
     static final CharDisplayMap nicerLookingDisplay = new CharDisplayMap() {{
         // nicer looking for most cases
         put("-", "―"); // U+2015 ― HORIZONTAL BAR
     }};
-
-    /**
-     * Multiple maps are available to quickly change
-     * the style of the keys.
-     */
-
     /**
      * Some classic symbols everybody knows
      */
@@ -163,7 +66,6 @@ public class ExtraKeysInfos {
         putAll(nicerLookingDisplay);
         // all other characters are displayed as themselves
     }};
-
     /**
      * Classic symbols and less known symbols
      */
@@ -173,7 +75,6 @@ public class ExtraKeysInfos {
         putAll(lessKnownCharactersDisplay); // NEW
         putAll(nicerLookingDisplay);
     }};
-
     /**
      * Only arrows
      */
@@ -183,7 +84,6 @@ public class ExtraKeysInfos {
         // putAll(lessKnownCharactersDisplay); // REMOVED
         putAll(nicerLookingDisplay);
     }};
-
     /**
      * Full Iso
      */
@@ -194,7 +94,6 @@ public class ExtraKeysInfos {
         putAll(nicerLookingDisplay);
         putAll(notKnownIsoCharacters); // NEW
     }};
-
     /**
      * Some people might call our keys differently
      */
@@ -231,6 +130,87 @@ public class ExtraKeysInfos {
         put("QUOTE", "\"");
         put("APOSTROPHE", "'");
     }};
+    /**
+     * Matrix of buttons displayed
+     */
+    private ExtraKeyButton[][] buttons;
+    /**
+     * This corresponds to one of the CharMapDisplay below
+     */
+    private String style = "default";
+
+    /**
+     * Multiple maps are available to quickly change
+     * the style of the keys.
+     */
+
+    public ExtraKeysInfos(String propertiesInfo, String style) throws JSONException {
+        this.style = style;
+
+        // Convert String propertiesInfo to Array of Arrays
+        JSONArray arr = new JSONArray(propertiesInfo);
+        Object[][] matrix = new Object[arr.length()][];
+        for (int i = 0; i < arr.length(); i++) {
+            JSONArray line = arr.getJSONArray(i);
+            matrix[i] = new Object[line.length()];
+            for (int j = 0; j < line.length(); j++) {
+                matrix[i][j] = line.get(j);
+            }
+        }
+
+        // convert matrix to buttons
+        this.buttons = new ExtraKeyButton[matrix.length][];
+        for (int i = 0; i < matrix.length; i++) {
+            this.buttons[i] = new ExtraKeyButton[matrix[i].length];
+            for (int j = 0; j < matrix[i].length; j++) {
+                Object key = matrix[i][j];
+
+                JSONObject jobject = normalizeKeyConfig(key);
+
+                ExtraKeyButton button;
+
+                if (!jobject.has("popup")) {
+                    // no popup
+                    button = new ExtraKeyButton(getSelectedCharMap(), jobject);
+                } else {
+                    // a popup
+                    JSONObject popupJobject = normalizeKeyConfig(jobject.get("popup"));
+                    ExtraKeyButton popup = new ExtraKeyButton(getSelectedCharMap(), popupJobject);
+                    button = new ExtraKeyButton(getSelectedCharMap(), jobject, popup);
+                }
+
+                this.buttons[i][j] = button;
+            }
+        }
+    }
+
+    /**
+     * "hello" -> {"key": "hello"}
+     */
+    private static JSONObject normalizeKeyConfig(Object key) throws JSONException {
+        JSONObject jobject;
+        if (key instanceof String) {
+            jobject = new JSONObject();
+            jobject.put("key", key);
+        } else if (key instanceof JSONObject) {
+            jobject = (JSONObject) key;
+        } else {
+            throw new JSONException("An key in the extra-key matrix must be a string or an object");
+        }
+        return jobject;
+    }
+
+    /**
+     * Applies the 'controlCharsAliases' mapping to all the strings in *buttons*
+     * Modifies the array, doesn't return a new one.
+     */
+    public static String replaceAlias(String key) {
+        return controlCharsAliases.get(key, key);
+    }
+
+    public ExtraKeyButton[][] getMatrix() {
+        return buttons;
+    }
 
     CharDisplayMap getSelectedCharMap() {
         switch (style) {
@@ -248,11 +228,19 @@ public class ExtraKeysInfos {
     }
 
     /**
-     * Applies the 'controlCharsAliases' mapping to all the strings in *buttons*
-     * Modifies the array, doesn't return a new one.
+     * HashMap that implements Python dict.get(key, default) function.
+     * Default java.util .get(key) is then the same as .get(key, null);
      */
-    public static String replaceAlias(String key) {
-        return controlCharsAliases.get(key, key);
+    static class CleverMap<K, V> extends HashMap<K, V> {
+        V get(K key, V defaultValue) {
+            if (containsKey(key))
+                return get(key);
+            else
+                return defaultValue;
+        }
+    }
+
+    static class CharDisplayMap extends CleverMap<String, String> {
     }
 }
 

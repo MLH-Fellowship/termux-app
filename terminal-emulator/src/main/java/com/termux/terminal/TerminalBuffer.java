@@ -11,13 +11,21 @@ import java.util.Arrays;
 public final class TerminalBuffer {
 
     TerminalRow[] mLines;
-    /** The length of {@link #mLines}. */
+    /**
+     * The length of {@link #mLines}.
+     */
     int mTotalRows;
-    /** The number of rows and columns visible on the screen. */
+    /**
+     * The number of rows and columns visible on the screen.
+     */
     int mScreenRows, mColumns;
-    /** The number of rows kept in history. */
+    /**
+     * The number of rows kept in history.
+     */
     private int mActiveTranscriptRows = 0;
-    /** The index in the circular buffer where the visible screen starts. */
+    /**
+     * The index in the circular buffer where the visible screen starts.
+     */
     private int mScreenFirstRow = 0;
 
     /**
@@ -417,7 +425,9 @@ public final class TerminalBuffer {
         return allocateFullLineIfNecessary(externalToInternalRow(externalRow)).getStyle(column);
     }
 
-    /** Support for http://vt100.net/docs/vt510-rm/DECCARA and http://vt100.net/docs/vt510-rm/DECCARA */
+    /**
+     * Support for http://vt100.net/docs/vt510-rm/DECCARA and http://vt100.net/docs/vt510-rm/DECCARA
+     */
     public void setOrClearEffect(int bits, boolean setOrClear, boolean reverse, boolean rectangular, int leftMargin, int rightMargin, int top, int left,
                                  int bottom, int right) {
         for (int y = top; y < bottom; y++) {

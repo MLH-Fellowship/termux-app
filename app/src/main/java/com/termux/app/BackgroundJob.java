@@ -28,7 +28,7 @@ public final class BackgroundJob {
 
     final Process mProcess;
 
-    public BackgroundJob(String cwd, String fileToExecute, final String[] args, final TermuxService service){
+    public BackgroundJob(String cwd, String fileToExecute, final String[] args, final TermuxService service) {
         this(cwd, fileToExecute, args, service, null);
     }
 
@@ -110,7 +110,7 @@ public final class BackgroundJob {
                     Intent data = new Intent();
                     data.putExtra("result", result);
 
-                    if(pendingIntent != null) {
+                    if (pendingIntent != null) {
                         try {
                             pendingIntent.send(service.getApplicationContext(), Activity.RESULT_OK, data);
                         } catch (PendingIntent.CanceledException e) {

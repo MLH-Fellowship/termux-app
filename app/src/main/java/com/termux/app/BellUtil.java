@@ -7,8 +7,23 @@ import android.os.SystemClock;
 import android.os.Vibrator;
 
 public class BellUtil {
-    private static BellUtil instance = null;
     private static final Object lock = new Object();
+    private static final long DURATION = 50;
+    private static final long MIN_PAUSE = 3 * DURATION;
+    private static BellUtil instance = null;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable bellRunnable;
+    private long lastBell = 0;
+    private BellUtil(final Vibrator vibrator) {
+        bellRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (vibrator != null) {
+                    vibrator.vibrate(DURATION);
+                }
+            }
+        };
+    }
 
     public static BellUtil getInstance(Context context) {
         if (instance == null) {
@@ -20,24 +35,6 @@ public class BellUtil {
         }
 
         return instance;
-    }
-
-    private static final long DURATION = 50;
-    private static final long MIN_PAUSE = 3 * DURATION;
-
-    private final Handler handler = new Handler(Looper.getMainLooper());
-    private long lastBell = 0;
-    private final Runnable bellRunnable;
-
-    private BellUtil(final Vibrator vibrator) {
-        bellRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (vibrator != null) {
-                    vibrator.vibrate(DURATION);
-                }
-            }
-        };
     }
 
     public synchronized void doBell() {

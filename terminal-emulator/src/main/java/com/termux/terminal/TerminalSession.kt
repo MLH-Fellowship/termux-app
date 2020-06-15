@@ -7,7 +7,6 @@ import android.system.ErrnoException
 import android.system.Os
 import android.system.OsConstants
 import android.util.Log
-import com.termux.terminal.TerminalSession
 import java.io.*
 import java.lang.reflect.Field
 import java.nio.charset.StandardCharsets
@@ -78,7 +77,7 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
     @SuppressLint("HandlerLeak")
     val mMainThreadHandler: Handler = object : Handler() {
         val mReceiveBuffer: ByteArray = ByteArray(4 * 1024)
-        public override fun handleMessage(msg: Message) {
+        override fun handleMessage(msg: Message) {
             if (msg.what == MSG_NEW_INPUT && isRunning) {
                 val bytesRead: Int = mProcessToTerminalIOQueue.read(mReceiveBuffer, false)
                 if (bytesRead > 0) {
@@ -134,7 +133,7 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
         pid = processId.get(0)
         val terminalFileDescriptorWrapped: FileDescriptor = wrapFileDescriptor(mTerminalFileDescriptor)
         object : Thread("TermSessionInputReader[pid=" + pid + "]") {
-            public override fun run() {
+            override fun run() {
                 try {
                     FileInputStream(terminalFileDescriptorWrapped).use({ termIn ->
                         val buffer: ByteArray = ByteArray(4096)
@@ -151,7 +150,7 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
             }
         }.start()
         object : Thread("TermSessionOutputWriter[pid=" + pid + "]") {
-            public override fun run() {
+            override fun run() {
                 val buffer: ByteArray = ByteArray(4096)
                 try {
                     FileOutputStream(terminalFileDescriptorWrapped).use({ termOut ->
@@ -167,7 +166,7 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
             }
         }.start()
         object : Thread("TermSessionWaiter[pid=" + pid + "]") {
-            public override fun run() {
+            override fun run() {
                 val processExitCode: Int = JNI.waitFor(pid)
                 mMainThreadHandler.sendMessage(mMainThreadHandler.obtainMessage(MSG_PROCESS_EXITED, processExitCode))
             }
@@ -175,7 +174,7 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
     }
 
     /** Write data to the shell process.  */
-    public override fun write(data: ByteArray, offset: Int, count: Int) {
+    override fun write(data: ByteArray, offset: Int, count: Int) {
         if (pid > 0) mTerminalToProcessIOQueue.write(data, offset, count)
     }
 
@@ -186,24 +185,24 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
             throw IllegalArgumentException("Invalid code point: " + codePoint)
         }
         var bufferPosition: Int = 0
-        if (prependEscape) mUtf8InputBuffer.get(bufferPosition++) = 27
+        if (prependEscape) mUtf8InputBuffer[bufferPosition++] = 27
         if (codePoint <=  /* 7 bits */127) {
-            mUtf8InputBuffer.get(bufferPosition++) = codePoint.toByte()
+            mUtf8InputBuffer[bufferPosition++] = codePoint.toByte()
         } else if (codePoint <=  /* 11 bits */2047) {
             /* 110xxxxx leading byte with leading 5 bits */
-            mUtf8InputBuffer.get(bufferPosition++) = (192 or (codePoint shr 6)).toByte()
-            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer.get(bufferPosition++) = (128 or (codePoint and 63)).toByte()
+            mUtf8InputBuffer[bufferPosition++] = (192 or (codePoint shr 6)).toByte()
+            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer[bufferPosition++] = (128 or (codePoint and 63)).toByte()
         } else if (codePoint <=  /* 16 bits */65535) {
             /* 1110xxxx leading byte with leading 4 bits */
-            mUtf8InputBuffer.get(bufferPosition++) = (224 or (codePoint shr 12)).toByte()
-            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer.get(bufferPosition++) = (128 or ((codePoint shr 6) and 63)).toByte()
+            mUtf8InputBuffer[bufferPosition++] = (224 or (codePoint shr 12)).toByte()
+            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer[bufferPosition++] = (128 or ((codePoint shr 6) and 63)).toByte()
             /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer.get(bufferPosition++) = (128 or (codePoint and 63)).toByte()
         } else { /* We have checked codePoint <= 1114111 above, so we have max 21 bits = 0b111111111111111111111 */
             /* 11110xxx leading byte with leading 3 bits */
-            mUtf8InputBuffer.get(bufferPosition++) = (240 or (codePoint shr 18)).toByte()
-            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer.get(bufferPosition++) = (128 or ((codePoint shr 12) and 63)).toByte()
-            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer.get(bufferPosition++) = (128 or ((codePoint shr 6) and 63)).toByte()
-            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer.get(bufferPosition++) = (128 or (codePoint and 63)).toByte()
+            mUtf8InputBuffer[bufferPosition++] = (240 or (codePoint shr 18)).toByte()
+            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer[bufferPosition++] = (128 or ((codePoint shr 12) and 63)).toByte()
+            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer[bufferPosition++] = (128 or ((codePoint shr 6) and 63)).toByte()
+            /* 10xxxxxx continuation byte with following 6 bits */mUtf8InputBuffer[bufferPosition++] = (128 or (codePoint and 63)).toByte()
         }
         write(mUtf8InputBuffer, 0, bufferPosition)
     }
@@ -243,7 +242,7 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
         JNI.close(mTerminalFileDescriptor)
     }
 
-    public override fun titleChanged(oldTitle: String?, newTitle: String?) {
+    override fun titleChanged(oldTitle: String?, newTitle: String?) {
         mChangeCallback.onTitleChanged(this)
     }
 
@@ -253,15 +252,15 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
             return pid != -1
         }
 
-    public override fun clipboardText(text: String?) {
+    override fun clipboardText(text: String?) {
         mChangeCallback.onClipboardText(this, text)
     }
 
-    public override fun onBell() {
+    override fun onBell() {
         mChangeCallback.onBell(this)
     }
 
-    public override fun onColorsChanged() {
+    override fun onColorsChanged() {
         mChangeCallback.onColorsChanged(this)
     }
 
@@ -273,7 +272,7 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
             }
             try {
                 val cwdSymlink: String = String.format("/proc/%s/cwd/", pid)
-                val outputPath: String = File(cwdSymlink).getCanonicalPath()
+                val outputPath: String = File(cwdSymlink).canonicalPath
                 var outputPathWithTrailingSlash: String = outputPath
                 if (!outputPath.endsWith("/")) {
                     outputPathWithTrailingSlash += '/'
@@ -300,7 +299,7 @@ class TerminalSession constructor(private val mShellPath: String, private val mC
                     // For desktop java:
                     descriptorField = FileDescriptor::class.java.getDeclaredField("fd")
                 }
-                descriptorField.setAccessible(true)
+                descriptorField.isAccessible = true
                 descriptorField.set(result, fileDescriptor)
             } catch (e: NoSuchFieldException) {
                 Log.wtf(EmulatorDebug.LOG_TAG, "Error accessing FileDescriptor#descriptor private field", e)

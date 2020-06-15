@@ -33,7 +33,7 @@ import java.util.*
 class TermuxDocumentsProvider : DocumentsProvider() {
     @Throws(FileNotFoundException::class)
     override fun queryRoots(projection: Array<String>): Cursor {
-        val result = MatrixCursor(projection ?: DEFAULT_ROOT_PROJECTION)
+        val result = MatrixCursor(projection)
         val applicationName = context.getString(R.string.application_name)
         val row = result.newRow()
         row.add(Root.COLUMN_ROOT_ID, getDocIdForFile(BASE_DIR))
@@ -49,14 +49,14 @@ class TermuxDocumentsProvider : DocumentsProvider() {
 
     @Throws(FileNotFoundException::class)
     override fun queryDocument(documentId: String, projection: Array<String>): Cursor {
-        val result = MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION)
+        val result = MatrixCursor(projection)
         includeFile(result, documentId, null)
         return result
     }
 
     @Throws(FileNotFoundException::class)
     override fun queryChildDocuments(parentDocumentId: String, projection: Array<String>, sortOrder: String): Cursor {
-        val result = MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION)
+        val result = MatrixCursor(projection)
         val parent = getFileForDocId(parentDocumentId)
         for (file in parent.listFiles()) {
             if (!file.name.startsWith(".")) {
@@ -123,7 +123,7 @@ class TermuxDocumentsProvider : DocumentsProvider() {
 
     @Throws(FileNotFoundException::class)
     override fun querySearchDocuments(rootId: String, query: String, projection: Array<String>): Cursor {
-        val result = MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION)
+        val result = MatrixCursor(projection)
         val parent = getFileForDocId(rootId)
 
         // This example implementation searches file names for the query and doesn't rank search

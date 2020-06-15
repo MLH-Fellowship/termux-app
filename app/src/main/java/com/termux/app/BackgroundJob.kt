@@ -1,6 +1,6 @@
 package com.termux.app
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
@@ -208,7 +208,7 @@ class BackgroundJob @JvmOverloads constructor(cwd: String?, fileToExecute: Strin
                     data.putExtra("result", result)
                     if (pendingIntent != null) {
                         try {
-                            pendingIntent.send(service.applicationContext, Activity.RESULT_OK, data)
+                            pendingIntent.send(service.applicationContext, androidx.appcompat.app.AppCompatActivity.RESULT_OK, data)
                         } catch (e: PendingIntent.CanceledException) {
                             // The caller doesn't want the result? That's fine, just ignore
                         }

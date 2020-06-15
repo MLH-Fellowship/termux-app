@@ -146,11 +146,11 @@ class TermuxViewClient(val mActivity: TermuxActivity) : TerminalViewClient {
                 return true
             }
             val shortcuts = mActivity.mSettings!!.shortcuts
-            if (!shortcuts!!.isEmpty()) {
+            if (!shortcuts.isEmpty()) {
                 val codePointLowerCase = Character.toLowerCase(codePoint)
                 for (i in shortcuts.indices.reversed()) {
                     val shortcut = shortcuts[i]
-                    if (codePointLowerCase == shortcut!!.codePoint) {
+                    if (codePointLowerCase == shortcut.codePoint) {
                         when (shortcut.shortcutAction) {
                             TermuxPreferences.Companion.SHORTCUT_ACTION_CREATE_SESSION -> {
                                 mActivity.addNewSession(false, null)

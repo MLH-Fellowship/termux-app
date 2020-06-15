@@ -2,8 +2,10 @@ package com.termux.terminal
 
 import android.util.Base64
 import android.util.Log
+import java.lang.Character.*
 import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.experimental.and
 
 /**
  * Renders text into a screen. Contains all the terminal-specific knowledge and state. Emulates a subset of the X Window
@@ -33,6 +35,7 @@ class TerminalEmulator constructor(
     /** The cursor position. Between (0,0) and (mRows-1, mColumns-1).  */
     private var mCursorRow: Int = 0
     private var mCursorCol: Int = 0
+
     /** [.CURSOR_STYLE_BAR], [.CURSOR_STYLE_BLOCK] or [.CURSOR_STYLE_UNDERLINE]  */
     var cursorStyle: Int = CURSOR_STYLE_BLOCK
         private set
@@ -40,6 +43,7 @@ class TerminalEmulator constructor(
     /** The number of character rows and columns in the terminal screen.  */
     @JvmField
     var mRows: Int
+
     @JvmField
     var mColumns: Int
 
@@ -125,6 +129,7 @@ class TerminalEmulator constructor(
      */
     @JvmField
     var mForeColor: Int = 0
+
     @JvmField
     var mBackColor: Int = 0
 
@@ -141,6 +146,7 @@ class TerminalEmulator constructor(
     private var mUtf8Index: Byte = 0
     private val mUtf8InputBuffer: ByteArray = ByteArray(4)
     private var mLastEmittedCodePoint: Int = -1
+
     @JvmField
     val mColors: TerminalColors = TerminalColors()
     private fun isDecsetInternalBitSet(bit: Int): Boolean {
@@ -272,7 +278,7 @@ class TerminalEmulator constructor(
         }
 
     private fun setDefaultTabStops() {
-        for (i in 0 until mColumns) mTabStop.get(i) = (i and 7) == 0 && i != 0
+        for (i in 0 until mColumns) mTabStop[i] = (i and 7) == 0 && i != 0
     }
 
     /**
@@ -289,7 +295,7 @@ class TerminalEmulator constructor(
         if (mUtf8ToFollow > 0) {
             if ((byteToProcess and 192) == 128) {
                 // 10xxxxxx, a continuation byte.
-                mUtf8InputBuffer.get(mUtf8Index++.toInt()) = byteToProcess
+                mUtf8InputBuffer[mUtf8Index++.toInt()] = byteToProcess
                 if (--mUtf8ToFollow.toInt() == 0) {
                     val firstByteMask: Byte = (if (mUtf8Index.toInt() == 2) 31 else (if (mUtf8Index.toInt() == 3) 15 else 7)).toByte()
                     var codePoint: Int = (mUtf8InputBuffer.get(0) and firstByteMask)
@@ -308,8 +314,8 @@ class TerminalEmulator constructor(
                         // "It is not possible to use a C1 control obtained from decoding the
                         // UTF-8 text" - http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
                     } else {
-                        when (Character.getType(codePoint)) {
-                            Character.UNASSIGNED, Character.SURROGATE -> codePoint = UNICODE_REPLACEMENT_CHAR
+                        when (getType(codePoint)) {
+                            UNASSIGNED, SURROGATE -> codePoint = UNICODE_REPLACEMENT_CHAR
                         }
                         processCodePoint(codePoint)
                     }
@@ -343,7 +349,7 @@ class TerminalEmulator constructor(
                 processCodePoint(UNICODE_REPLACEMENT_CHAR)
                 return
             }
-            mUtf8InputBuffer.get(mUtf8Index++.toInt()) = byteToProcess
+            mUtf8InputBuffer[mUtf8Index++.toInt()] = byteToProcess
         }
     }
 
@@ -976,7 +982,7 @@ class TerminalEmulator constructor(
 
     /** Encountering a character in the [.ESC] state.  */
     private fun doEsc(b: Int) {
-        when (b) {
+        val any = when (b) {
             '#' -> continueSequence(ESC_POUND)
             '(' -> continueSequence(ESC_SELECT_LEFT_PAREN)
             ')' -> continueSequence(ESC_SELECT_RIGHT_PAREN)
@@ -1881,7 +1887,7 @@ class TerminalEmulator constructor(
     }
 
     /** http://www.vt100.net/docs/vt510-rm/DECSC  */
-    internal class SavedScreenState constructor() {
+    internal class SavedScreenState {
         /** Saved state of the cursor position, Used to implement the save/restore cursor position escape sequences.  */
         var mSavedCursorRow: Int = 0
         var mSavedCursorCol: Int = 0
@@ -1894,7 +1900,7 @@ class TerminalEmulator constructor(
         var mUseLineDrawingUsesG0: Boolean = true
     }
 
-    public override fun toString(): String {
+    override fun toString(): String {
         return ("TerminalEmulator[size=" + screen.mColumns + "x" + screen.mScreenRows + ", margins={" + mTopMargin + "," + mRightMargin + "," + mBottomMargin
             + "," + mLeftMargin + "}]")
     }
@@ -1902,20 +1908,26 @@ class TerminalEmulator constructor(
     companion object {
         /** Log unknown or unimplemented escape sequences received from the shell process.  */
         private val LOG_ESCAPE_SEQUENCES: Boolean = false
+
         @JvmField
         val MOUSE_LEFT_BUTTON: Int = 0
 
         /** Mouse moving while having left mouse button pressed.  */
         @JvmField
         val MOUSE_LEFT_BUTTON_MOVED: Int = 32
+
         @JvmField
         val MOUSE_WHEELUP_BUTTON: Int = 64
+
         @JvmField
         val MOUSE_WHEELDOWN_BUTTON: Int = 65
+
         @JvmField
         val CURSOR_STYLE_BLOCK: Int = 0
+
         @JvmField
         val CURSOR_STYLE_UNDERLINE: Int = 1
+
         @JvmField
         val CURSOR_STYLE_BAR: Int = 2
 

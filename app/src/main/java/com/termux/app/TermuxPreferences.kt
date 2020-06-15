@@ -110,7 +110,7 @@ class TermuxPreferences(context: Context) {
             Log.e("termux", "Keyboard shortcut '$name' is not Ctrl+<something>")
             return
         }
-        val c = input!![0]
+        val c = input[0]
         var codePoint = c.toInt()
         if (Character.isLowSurrogate(c)) {
             codePoint = if (input.length != 2 || Character.isHighSurrogate(input[1])) {

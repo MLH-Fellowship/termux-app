@@ -1,6 +1,6 @@
 package com.termux.app
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -15,7 +15,7 @@ import android.widget.RelativeLayout
 /**
  * Basic embedded browser for viewing help pages.
  */
-class TermuxHelpActivity : Activity() {
+class TermuxHelpActivity : androidx.appcompat.app.AppCompatActivity() {
     var mWebView: WebView? = null
     override fun onCreate(savedInstanceState: Bundle) {
         super.onCreate(savedInstanceState)

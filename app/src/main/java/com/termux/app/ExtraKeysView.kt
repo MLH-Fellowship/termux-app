@@ -139,11 +139,11 @@ class ExtraKeysView(context: Context?, attrs: AttributeSet?) : GridLayout(contex
         for (state in specialButtons.values) state.button = null
         removeAllViews()
         val buttons = infos.matrix
-        rowCount = buttons!!.size
+        rowCount = buttons.size
         columnCount = maximumLength(buttons)
         for (row in buttons.indices) {
             for (col in 0 until buttons[row].length) {
-                val buttonInfo = buttons[row]!![col]
+                val buttonInfo = buttons[row][col]
                 var button: Button
                 if (Arrays.asList("CTRL", "ALT", "FN").contains(buttonInfo.key)) {
                     val state = specialButtons[SpecialButton.valueOf(buttonInfo.key)] // for valueOf: https://stackoverflow.com/a/604426/1980630

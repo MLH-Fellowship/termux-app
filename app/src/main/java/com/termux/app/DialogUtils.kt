@@ -1,8 +1,8 @@
 package com.termux.app
 
 import android.R
-import android.app.Activity
-import android.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import android.content.DialogInterface
 import android.text.Selection
 import android.util.TypedValue
@@ -14,7 +14,7 @@ import android.widget.TextView
 
 object DialogUtils {
     @JvmStatic
-    fun textInput(activity: Activity, titleText: Int, initialText: String?,
+    fun textInput(activity: androidx.appcompat.app.AppCompatActivity, titleText: Int, initialText: String?,
                   positiveButtonText: Int, onPositive: TextSetListener,
                   neutralButtonText: Int, onNeutral: TextSetListener?,
                   negativeButtonText: Int, onNegative: TextSetListener?,
@@ -25,7 +25,7 @@ object DialogUtils {
             input.setText(initialText)
             Selection.setSelection(input.text, initialText.length)
         }
-        val dialogHolder = arrayOfNulls<AlertDialog>(1)
+        val dialogHolder = arrayOfNulls<androidx.appcompat.app.AlertDialog>(1)
         input.setImeActionLabel(activity.resources.getString(positiveButtonText), KeyEvent.KEYCODE_ENTER)
         input.setOnEditorActionListener { v: TextView?, actionId: Int, event: KeyEvent? ->
             onPositive.onTextSet(input.text.toString())
@@ -41,7 +41,7 @@ object DialogUtils {
         layout.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         layout.setPadding(paddingTopAndSides, paddingTopAndSides, paddingTopAndSides, paddingBottom)
         layout.addView(input)
-        val builder = AlertDialog.Builder(activity)
+        val builder = androidx.appcompat.app.AlertDialog.Builder(activity)
             .setTitle(titleText).setView(layout)
             .setPositiveButton(positiveButtonText) { d: DialogInterface?, whichButton: Int -> onPositive.onTextSet(input.text.toString()) }
         if (onNeutral != null) {

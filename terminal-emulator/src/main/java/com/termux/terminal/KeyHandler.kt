@@ -8,6 +8,7 @@ object KeyHandler {
     const val KEYMOD_CTRL = 0x40000000
     const val KEYMOD_SHIFT = 0x20000000
     private val TERMCAP_TO_KEYCODE: MutableMap<String, Int> = HashMap()
+
     @JvmStatic
     fun getCodeFromTermcap(termcap: String, cursorKeysApplication: Boolean, keypadApplication: Boolean): String? {
         val keyCodeAndMod = TERMCAP_TO_KEYCODE[termcap] ?: return null

@@ -192,7 +192,7 @@ class TerminalRow(
             // Shift the rest of the line left.
             System.arraycopy(text, oldNextColumnIndex, text, newNextColumnIndex, mSpaceUsed - oldNextColumnIndex)
         }
-        (mSpaceUsed += javaCharDifference.toShort()).toShort()
+        (this.mSpaceUsed += javaCharDifference.toShort()).toShort()
 
         // Store char. A combining character is stored at the end of the existing contents so that it modifies them:
         Character.toChars(codePoint, text, oldStartOfColumnIndex + if (newIsCombining) oldCharactersUsedForColumn else 0)
@@ -226,7 +226,7 @@ class TerminalRow(
 
                 // Shift the array leftwards.
                 System.arraycopy(text, newNextNextColumnIndex, text, newNextColumnIndex, mSpaceUsed - newNextNextColumnIndex)
-                (mSpaceUsed -= nextLen.toShort()).toShort()
+                (this.mSpaceUsed -= nextLen.toShort()).toShort()
             }
         }
     }

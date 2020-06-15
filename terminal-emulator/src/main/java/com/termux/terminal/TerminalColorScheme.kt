@@ -8,7 +8,7 @@ import java.util.*
  *
  * @see TerminalColors
  */
-class TerminalColorScheme constructor() {
+class TerminalColorScheme {
     @JvmField
     val mDefaultColors: IntArray = IntArray(TextStyle.NUM_INDEXED_COLORS)
     private fun reset() {
@@ -38,7 +38,7 @@ class TerminalColorScheme constructor() {
             }
             val colorValue: Int = TerminalColors.Companion.parse(value)
             if (colorValue == 0) throw IllegalArgumentException("Property '" + key + "' has invalid color: '" + value + "'")
-            mDefaultColors.get(colorIndex) = colorValue
+            mDefaultColors[colorIndex] = colorValue
         }
     }
 

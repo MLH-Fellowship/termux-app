@@ -33,7 +33,7 @@
         android:extractNativeLibs="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/application_name"
-        android:supportsRtl="false"
+        android:supportsRtl="true"
         android:theme="@style/Theme.Termux">
 
         <!-- This (or rather, value 2.1 or higher) is needed to make the Samsung Galaxy S8
@@ -69,7 +69,7 @@
             android:label="@string/application_name"
             android:parentActivityName=".app.TermuxActivity"
             android:resizeableActivity="true"
-            android:theme="@android:style/Theme.Material.Light.DarkActionBar" />
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
 
         <activity
             android:name="com.termux.filepicker.TermuxFileReceiverActivity"

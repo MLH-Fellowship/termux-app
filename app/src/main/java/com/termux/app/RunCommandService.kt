@@ -7,7 +7,6 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import com.termux.app.RunCommandService
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader

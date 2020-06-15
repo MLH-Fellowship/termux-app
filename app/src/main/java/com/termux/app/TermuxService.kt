@@ -336,6 +336,7 @@ class TermuxService : Service(), SessionChangedCallback {
         @SuppressLint("SdCardPath")
         val FILES_PATH = "/data/data/com.termux/files"
         val PREFIX_PATH = "$FILES_PATH/usr"
+
         @JvmField
         val HOME_PATH = "$FILES_PATH/home"
 

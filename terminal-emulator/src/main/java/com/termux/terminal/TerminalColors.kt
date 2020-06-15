@@ -1,7 +1,7 @@
 package com.termux.terminal
 
 /** Current terminal colors (if different from default).  */
-class TerminalColors constructor() {
+class TerminalColors {
     /**
      * The current terminal colors, which are normally set from the color theme, but may be set dynamically with the OSC
      * 4 control sequence.
@@ -11,7 +11,7 @@ class TerminalColors constructor() {
 
     /** Reset a particular indexed color with the default color from the color theme.  */
     fun reset(index: Int) {
-        mCurrentColors.get(index) = COLOR_SCHEME.mDefaultColors.get(index)
+        mCurrentColors[index] = COLOR_SCHEME.mDefaultColors.get(index)
     }
 
     /** Reset all indexed colors with the default color from the color theme.  */
@@ -22,7 +22,7 @@ class TerminalColors constructor() {
     /** Try parse a color from a text parameter and into a specified index.  */
     fun tryParseColor(intoIndex: Int, textParameter: String) {
         val c: Int = parse(textParameter)
-        if (c != 0) mCurrentColors.get(intoIndex) = c
+        if (c != 0) mCurrentColors[intoIndex] = c
     }
 
     companion object {

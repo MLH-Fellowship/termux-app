@@ -24,7 +24,6 @@ import android.widget.Scroller
 import com.termux.terminal.*
 import com.termux.terminal.KeyHandler.getCode
 import com.termux.terminal.WcWidth.width
-import com.termux.view.TerminalView
 
 /** View displaying and interacting with a [TerminalSession].  */
 class TerminalView(context: Context, attributes: AttributeSet?) : View(context, attributes) {

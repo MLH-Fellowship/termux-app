@@ -4,8 +4,8 @@ plugins {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 ext {
     bintrayName = 'terminal-emulator'
@@ -64,8 +64,9 @@ tasks.withType(Test) {
 
 dependencies {
     testImplementation 'junit:junit:4.13'
-    implementation "androidx.core:core-ktx:+"
+    implementation 'androidx.core:core-ktx:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
 }
 
 apply from: '../scripts/bintray-publish.gradle'

@@ -1,6 +1,5 @@
 package com.termux.app
 
-import com.termux.app.ExtraKeysInfos
 import com.termux.app.ExtraKeysInfos.CharDisplayMap
 import org.json.JSONArray
 import org.json.JSONException

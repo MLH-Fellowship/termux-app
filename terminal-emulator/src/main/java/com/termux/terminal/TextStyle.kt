@@ -51,6 +51,7 @@ object TextStyle {
     /** Normal foreground and background colors and no effects.  */
     @JvmField
     val NORMAL = encode(COLOR_INDEX_FOREGROUND, COLOR_INDEX_BACKGROUND, 0)
+
     @JvmStatic
     fun encode(foreColor: Int, backColor: Int, effect: Int): Long {
         var result = (effect and 511.toLong().toInt()).toLong()

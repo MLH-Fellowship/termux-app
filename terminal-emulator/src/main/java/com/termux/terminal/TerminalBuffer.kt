@@ -171,13 +171,13 @@ class TerminalBuffer constructor(var mColumns: Int,
             mScreenFirstRow = if ((mScreenFirstRow < 0)) (mScreenFirstRow + mTotalRows) else (mScreenFirstRow % mTotalRows)
             mTotalRows = newTotalRows
             activeTranscriptRows = if (altScreen) 0 else Math.max(0, activeTranscriptRows + shiftDownOfTopRow)
-            cursor.get(1) -= shiftDownOfTopRow
+            cursor[1] -= shiftDownOfTopRow
             mScreenRows = newRows
         } else {
             // Copy away old state and update new:
             val oldLines: Array<TerminalRow?> = mLines
             mLines = arrayOfNulls(newTotalRows)
-            for (i in 0 until newTotalRows) mLines.get(i) = TerminalRow(newColumns, currentStyle)
+            for (i in 0 until newTotalRows) mLines[i] = TerminalRow(newColumns, currentStyle)
             val oldActiveTranscriptRows: Int = activeTranscriptRows
             val oldScreenFirstRow: Int = mScreenFirstRow
             val oldScreenRows: Int = mScreenRows
@@ -280,14 +280,14 @@ class TerminalBuffer constructor(var mColumns: Int,
                     currentOutputExternalColumn = 0
                 }
             }
-            cursor.get(0) = newCursorColumn
-            cursor.get(1) = newCursorRow
+            cursor[0] = newCursorColumn
+            cursor[1] = newCursorRow
         }
 
         // Handle cursor scrolling off screen:
         if (cursor.get(0) < 0 || cursor.get(1) < 0) {
-            cursor.get(1) = 0
-            cursor.get(0) = cursor.get(1)
+            cursor[1] = 0
+            cursor[0] = cursor.get(1)
         }
     }
 
@@ -305,9 +305,9 @@ class TerminalBuffer constructor(var mColumns: Int,
         // Save away line to be overwritten:
         val lineToBeOverWritten: TerminalRow? = mLines.get((srcInternal + start + 1) % totalRows)
         // Do the copy from bottom to top.
-        for (i in start downTo 0) mLines.get((srcInternal + i + 1) % totalRows) = mLines.get((srcInternal + i) % totalRows)
+        for (i in start downTo 0) mLines[(srcInternal + i + 1) % totalRows] = mLines.get((srcInternal + i) % totalRows)
         // Put back overwritten line, now above the block:
-        mLines.get((srcInternal) % totalRows) = lineToBeOverWritten
+        mLines[(srcInternal) % totalRows] = lineToBeOverWritten
     }
 
     /**
@@ -334,7 +334,7 @@ class TerminalBuffer constructor(var mColumns: Int,
         // Blank the newly revealed line above the bottom margin:
         val blankRow: Int = externalToInternalRow(bottomMargin - 1)
         if (mLines.get(blankRow) == null) {
-            mLines.get(blankRow) = TerminalRow(mColumns, style)
+            mLines[blankRow] = TerminalRow(mColumns, style)
         } else {
             mLines.get(blankRow)!!.clear(style)
         }
@@ -377,7 +377,7 @@ class TerminalBuffer constructor(var mColumns: Int,
     }
 
     fun allocateFullLineIfNecessary(row: Int): TerminalRow {
-        return (if ((mLines.get(row) == null)) (TerminalRow(mColumns, 0).also({ mLines.get(row) = it })) else mLines.get(row)!!)
+        return (if ((mLines.get(row) == null)) (TerminalRow(mColumns, 0).also({ mLines[row] = it })) else mLines.get(row)!!)
     }
 
     fun setChar(column: Int, row: Int, codePoint: Int, style: Long) {
@@ -411,7 +411,7 @@ class TerminalBuffer constructor(var mColumns: Int,
                 } else {
                     effect = effect and bits.inv()
                 }
-                line.mStyle.get(x) = TextStyle.encode(foreColor, backColor, effect)
+                line.mStyle[x] = TextStyle.encode(foreColor, backColor, effect)
             }
         }
     }

@@ -2,8 +2,8 @@ package com.termux.app
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -31,7 +31,6 @@ import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.SimpleOnPageChangeListener
 import com.termux.R
 import com.termux.app.DialogUtils.TextSetListener
-import com.termux.app.TermuxActivity
 import com.termux.terminal.EmulatorDebug
 import com.termux.terminal.TerminalColors
 import com.termux.terminal.TerminalSession
@@ -54,7 +53,7 @@ import java.util.regex.Pattern
  *
  * about memory leaks.
  */
-class TermuxActivity : Activity(), ServiceConnection {
+class TermuxActivity : androidx.appcompat.app.AppCompatActivity(), ServiceConnection {
     val mBellSoundPool = SoundPool.Builder().setMaxStreams(1).setAudioAttributes(
         AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION).build()).build()
@@ -484,14 +483,14 @@ class TermuxActivity : Activity(), ServiceConnection {
 
     fun addNewSession(failSafe: Boolean, sessionName: String?) {
         if (mTermService.getSessions().size >= MAX_SESSIONS) {
-            AlertDialog.Builder(this).setTitle(R.string.max_terminals_reached_title).setMessage(R.string.max_terminals_reached_message)
+            androidx.appcompat.app.AlertDialog.Builder(this).setTitle(R.string.max_terminals_reached_title).setMessage(R.string.max_terminals_reached_message)
                 .setPositiveButton(android.R.string.ok, null).show()
         } else {
             val currentSession = currentTermSession
             val workingDirectory = currentSession?.cwd
             val newSession = mTermService!!.createTermSession(null, null, workingDirectory, failSafe)
             if (sessionName != null) {
-                newSession!!.mSessionName = sessionName
+                newSession.mSessionName = sessionName
             }
             switchToSession(newSession)
             drawer.closeDrawers()
@@ -557,14 +556,14 @@ class TermuxActivity : Activity(), ServiceConnection {
         val text = currentTermSession!!.emulator.screen.transcriptTextWithFullLinesJoined
         val urlSet = extractUrls(text)
         if (urlSet.isEmpty()) {
-            AlertDialog.Builder(this).setMessage(R.string.select_url_no_found).show()
+            androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.select_url_no_found).show()
             return
         }
         val urls = urlSet.toTypedArray()
         Collections.reverse(Arrays.asList(*urls)) // Latest first.
 
         // Click to copy url to clipboard:
-        val dialog = AlertDialog.Builder(this@TermuxActivity).setItems(urls) { di: DialogInterface?, which: Int ->
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this@TermuxActivity).setItems(urls) { di: DialogInterface?, which: Int ->
             val url = urls[which] as String
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             clipboard.primaryClip = ClipData(null, arrayOf("text/plain"), ClipData.Item(url))
@@ -623,7 +622,7 @@ class TermuxActivity : Activity(), ServiceConnection {
                 true
             }
             CONTEXTMENU_KILL_PROCESS_ID -> {
-                val b = AlertDialog.Builder(this)
+                val b = androidx.appcompat.app.AlertDialog.Builder(this)
                 b.setIcon(android.R.drawable.ic_dialog_alert)
                 b.setMessage(R.string.confirm_kill_process)
                 b.setPositiveButton(android.R.string.yes) { dialog: DialogInterface, id: Int ->
@@ -649,10 +648,10 @@ class TermuxActivity : Activity(), ServiceConnection {
                 } catch (e: ActivityNotFoundException) {
                     // The startActivity() call is not documented to throw IllegalArgumentException.
                     // However, crash reporting shows that it sometimes does, so catch it here.
-                    AlertDialog.Builder(this).setMessage(R.string.styling_not_installed)
+                    androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.styling_not_installed)
                         .setPositiveButton(R.string.styling_install) { dialog: DialogInterface?, which: Int -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.termux.styling"))) }.setNegativeButton(android.R.string.cancel, null).show()
                 } catch (e: IllegalArgumentException) {
-                    AlertDialog.Builder(this).setMessage(R.string.styling_not_installed)
+                    androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.styling_not_installed)
                         .setPositiveButton(R.string.styling_install) { dialog: DialogInterface?, which: Int -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.termux.styling"))) }.setNegativeButton(android.R.string.cancel, null).show()
                 }
                 true
@@ -743,6 +742,7 @@ class TermuxActivity : Activity(), ServiceConnection {
         private const val MAX_SESSIONS = 8
         private const val REQUESTCODE_PERMISSION_STORAGE = 1234
         private const val RELOAD_STYLE_ACTION = "com.termux.app.reload_style"
+
         @JvmStatic
         fun extractUrls(text: String): LinkedHashSet<CharSequence> {
             val regex_sb = StringBuilder()

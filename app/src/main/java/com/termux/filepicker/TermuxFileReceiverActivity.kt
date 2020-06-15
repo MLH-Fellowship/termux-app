@@ -1,7 +1,7 @@
 package com.termux.filepicker
 
-import android.app.Activity
-import android.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -12,12 +12,11 @@ import com.termux.R
 import com.termux.app.DialogUtils.TextSetListener
 import com.termux.app.DialogUtils.textInput
 import com.termux.app.TermuxService
-import com.termux.filepicker.TermuxFileReceiverActivity
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
 
-class TermuxFileReceiverActivity : Activity() {
+class TermuxFileReceiverActivity : androidx.appcompat.app.AppCompatActivity() {
     /**
      * If the activity should be finished when the name input dialog is dismissed. This is disabled
      * before showing an error dialog, since the act of showing the error dialog will cause the
@@ -67,7 +66,7 @@ class TermuxFileReceiverActivity : Activity() {
 
     fun showErrorDialogAndQuit(message: String?) {
         mFinishOnDismissNameDialog = false
-        AlertDialog.Builder(this).setMessage(message).setOnDismissListener { dialog: DialogInterface? -> finish() }.setPositiveButton(android.R.string.ok) { dialog: DialogInterface?, which: Int -> finish() }.show()
+        androidx.appcompat.app.AlertDialog.Builder(this).setMessage(message).setOnDismissListener { dialog: DialogInterface? -> finish() }.setPositiveButton(android.R.string.ok) { dialog: DialogInterface?, which: Int -> finish() }.show()
     }
 
     fun handleContentUri(uri: Uri, subjectFromIntent: String?) {

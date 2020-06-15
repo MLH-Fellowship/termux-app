@@ -1,7 +1,7 @@
 package com.termux.app
 
-import android.app.Activity
-import android.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -49,13 +49,13 @@ internal object TermuxInstaller {
     /**
      * Performs setup if necessary.
      */
-    fun setupIfNeeded(activity: Activity, whenDone: Runnable) {
+    fun setupIfNeeded(activity: androidx.appcompat.app.AppCompatActivity, whenDone: Runnable) {
         // Termux can only be run as the primary user (device owner) since only that
         // account has the expected file system paths. Verify that:
         val um = activity.getSystemService(Context.USER_SERVICE) as UserManager
         val isPrimaryUser = um.getSerialNumberForUser(Process.myUserHandle()) == 0L
         if (!isPrimaryUser) {
-            AlertDialog.Builder(activity).setTitle(R.string.bootstrap_error_title).setMessage(R.string.bootstrap_error_not_primary_user_message)
+            androidx.appcompat.app.AlertDialog.Builder(activity).setTitle(R.string.bootstrap_error_title).setMessage(R.string.bootstrap_error_not_primary_user_message)
                 .setOnDismissListener { dialog: DialogInterface? -> System.exit(0) }.setPositiveButton(android.R.string.ok, null).show()
             return
         }
@@ -119,7 +119,7 @@ internal object TermuxInstaller {
                     Log.e(EmulatorDebug.LOG_TAG, "Bootstrap error", e)
                     activity.runOnUiThread {
                         try {
-                            AlertDialog.Builder(activity).setTitle(R.string.bootstrap_error_title).setMessage(R.string.bootstrap_error_body)
+                            androidx.appcompat.app.AlertDialog.Builder(activity).setTitle(R.string.bootstrap_error_title).setMessage(R.string.bootstrap_error_body)
                                 .setNegativeButton(R.string.bootstrap_error_abort) { dialog: DialogInterface, which: Int ->
                                     dialog.dismiss()
                                     activity.finish()

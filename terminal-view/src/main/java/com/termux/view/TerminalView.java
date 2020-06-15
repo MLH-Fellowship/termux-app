@@ -36,6 +36,8 @@ import android.view.inputmethod.InputConnection;
 import android.widget.PopupWindow;
 import android.widget.Scroller;
 
+import androidx.core.view.MenuItemCompat;
+
 import com.termux.terminal.EmulatorDebug;
 import com.termux.terminal.KeyHandler;
 import com.termux.terminal.TerminalBuffer;
@@ -1262,8 +1264,8 @@ public final class TerminalView extends View {
                     int show = MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT;
 
                     ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                    menu.add(Menu.NONE, 1, Menu.NONE, R.string.copy_text).setShowAsAction(show);
-                    menu.add(Menu.NONE, 2, Menu.NONE, R.string.paste_text).setEnabled(clipboard.hasPrimaryClip()).setShowAsAction(show);
+                    MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, 1, Menu.NONE, R.string.copy_text), show);
+                    MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, 2, Menu.NONE, R.string.paste_text).setEnabled(clipboard.hasPrimaryClip()), show);
                     menu.add(Menu.NONE, 3, Menu.NONE, R.string.text_selection_more);
                     return true;
                 }

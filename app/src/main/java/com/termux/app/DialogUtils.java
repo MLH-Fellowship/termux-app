@@ -1,7 +1,5 @@
 package com.termux.app;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.Selection;
 import android.util.TypedValue;
@@ -10,9 +8,12 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 public final class DialogUtils {
 
-    public static void textInput(Activity activity, int titleText, String initialText,
+    public static void textInput(AppCompatActivity activity, int titleText, String initialText,
                                  int positiveButtonText, final TextSetListener onPositive,
                                  int neutralButtonText, final TextSetListener onNeutral,
                                  int negativeButtonText, final TextSetListener onNegative,
@@ -24,7 +25,7 @@ public final class DialogUtils {
             Selection.setSelection(input.getText(), initialText.length());
         }
 
-        final AlertDialog[] dialogHolder = new AlertDialog[1];
+        final androidx.appcompat.app.AlertDialog[] dialogHolder = new AlertDialog[1];
         input.setImeActionLabel(activity.getResources().getString(positiveButtonText), KeyEvent.KEYCODE_ENTER);
         input.setOnEditorActionListener((v, actionId, event) -> {
             onPositive.onTextSet(input.getText().toString());
@@ -43,7 +44,7 @@ public final class DialogUtils {
         layout.setPadding(paddingTopAndSides, paddingTopAndSides, paddingTopAndSides, paddingBottom);
         layout.addView(input);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+        androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(activity)
             .setTitle(titleText).setView(layout)
             .setPositiveButton(positiveButtonText, (d, whichButton) -> onPositive.onTextSet(input.getText().toString()));
 

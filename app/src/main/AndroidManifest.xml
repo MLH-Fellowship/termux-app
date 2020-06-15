@@ -3,7 +3,10 @@
     package="com.termux"
     android:installLocation="internalOnly"
     android:sharedUserId="com.termux"
-    android:sharedUserLabel="@string/shared_user_label">
+    android:sharedUserLabel="@string/shared_user_label"
+    xmlns:dist="http://schemas.android.com/apk/distribution">
+
+    <dist:module dist:instant="true" />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -34,7 +37,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/application_name"
         android:supportsRtl="false"
-        android:theme="@style/Theme.Termux">
+        android:theme="@style/Theme.AppCompat.Light">
 
         <!-- This (or rather, value 2.1 or higher) is needed to make the Samsung Galaxy S8
              mark the app with "This app is optimized to run in full screen." -->
@@ -69,7 +72,7 @@
             android:label="@string/application_name"
             android:parentActivityName=".app.TermuxActivity"
             android:resizeableActivity="true"
-            android:theme="@android:style/Theme.Material.Light.DarkActionBar" />
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
 
         <activity
             android:name="com.termux.filepicker.TermuxFileReceiverActivity"

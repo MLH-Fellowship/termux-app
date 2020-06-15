@@ -2,8 +2,6 @@ package com.termux.app;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -45,6 +43,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -78,7 +78,7 @@ import java.util.regex.Pattern;
  * </ul>
  * about memory leaks.
  */
-public final class TermuxActivity extends Activity implements ServiceConnection {
+public final class TermuxActivity extends AppCompatActivity implements ServiceConnection {
 
     public static final String TERMUX_FAILSAFE_SESSION_ACTION = "com.termux.app.failsafe_session";
 
@@ -768,7 +768,7 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
         Collections.reverse(Arrays.asList(urls)); // Latest first.
 
         // Click to copy url to clipboard:
-        final AlertDialog dialog = new AlertDialog.Builder(TermuxActivity.this).setItems(urls, (di, which) -> {
+        final AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(TermuxActivity.this).setItems(urls, (di, which) -> {
             String url = (String) urls[which];
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.setPrimaryClip(new ClipData(null, new String[]{"text/plain"}, new ClipData.Item(url)));
@@ -827,7 +827,7 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
                 doPaste();
                 return true;
             case CONTEXTMENU_KILL_PROCESS_ID:
-                final AlertDialog.Builder b = new AlertDialog.Builder(this);
+                final AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(this);
                 b.setIcon(android.R.drawable.ic_dialog_alert);
                 b.setMessage(R.string.confirm_kill_process);
                 b.setPositiveButton(android.R.string.yes, (dialog, id) -> {

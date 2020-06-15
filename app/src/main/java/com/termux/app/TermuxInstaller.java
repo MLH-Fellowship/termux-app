@@ -1,7 +1,5 @@
 package com.termux.app;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Environment;
@@ -10,6 +8,9 @@ import android.system.Os;
 import android.util.Log;
 import android.util.Pair;
 import android.view.WindowManager;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.termux.R;
 import com.termux.terminal.EmulatorDebug;
@@ -49,7 +50,7 @@ final class TermuxInstaller {
     /**
      * Performs setup if necessary.
      */
-    static void setupIfNeeded(final Activity activity, final Runnable whenDone) {
+    static void setupIfNeeded(final AppCompatActivity activity, final Runnable whenDone) {
         // Termux can only be run as the primary user (device owner) since only that
         // account has the expected file system paths. Verify that:
         UserManager um = (UserManager) activity.getSystemService(Context.USER_SERVICE);
@@ -135,7 +136,7 @@ final class TermuxInstaller {
                     Log.e(EmulatorDebug.LOG_TAG, "Bootstrap error", e);
                     activity.runOnUiThread(() -> {
                         try {
-                            new AlertDialog.Builder(activity).setTitle(R.string.bootstrap_error_title).setMessage(R.string.bootstrap_error_body)
+                            new androidx.appcompat.app.AlertDialog.Builder(activity).setTitle(R.string.bootstrap_error_title).setMessage(R.string.bootstrap_error_body)
                                 .setNegativeButton(R.string.bootstrap_error_abort, (dialog, which) -> {
                                     dialog.dismiss();
                                     activity.finish();

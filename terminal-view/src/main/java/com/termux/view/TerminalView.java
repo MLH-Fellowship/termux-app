@@ -36,14 +36,16 @@ import android.view.inputmethod.InputConnection;
 import android.widget.PopupWindow;
 import android.widget.Scroller;
 
-import androidx.core.view.MenuItemCompat;
-
 import com.termux.terminal.EmulatorDebug;
 import com.termux.terminal.KeyHandler;
 import com.termux.terminal.TerminalBuffer;
 import com.termux.terminal.TerminalEmulator;
 import com.termux.terminal.TerminalSession;
 import com.termux.terminal.WcWidth;
+
+import java.util.Objects;
+
+import static androidx.core.view.MenuItemCompat.setShowAsAction;
 
 /**
  * View displaying and interacting with a {@link TerminalSession}.
@@ -106,7 +108,7 @@ public final class TerminalView extends View {
      * Keep track of the time when a touch event leading to sending mouse scroll events started.
      */
     private long mMouseStartDownTime = -1;
-    private boolean mAccessibilityEnabled;
+    private final boolean mAccessibilityEnabled;
 
     public TerminalView(Context context, AttributeSet attributes) { // NO_UCD (unused code)
         super(context, attributes);
@@ -115,17 +117,16 @@ public final class TerminalView extends View {
             boolean scrolledWithFinger;
 
             @Override
-            public boolean onUp(MotionEvent e) {
+            public void onUp(MotionEvent e) {
                 mScrollRemainder = 0.0f;
                 if (mEmulator != null && mEmulator.isMouseTrackingActive() && !mIsSelectingText && !scrolledWithFinger) {
                     // Quick event processing when mouse tracking is active - do not wait for check of double tapping
                     // for zooming.
                     sendMouseEventCode(e, TerminalEmulator.MOUSE_LEFT_BUTTON, true);
                     sendMouseEventCode(e, TerminalEmulator.MOUSE_LEFT_BUTTON, false);
-                    return true;
+                    return;
                 }
                 scrolledWithFinger = false;
-                return false;
             }
 
             @Override
@@ -822,7 +823,6 @@ public final class TerminalView extends View {
 
         if (mSelectionModifierCursorController != null) {
             getViewTreeObserver().removeOnTouchModeChangeListener(mSelectionModifierCursorController);
-            mSelectionModifierCursorController.onDetached();
         }
     }
 
@@ -873,7 +873,7 @@ public final class TerminalView extends View {
 
         mIsSelectingText = true;
 
-        mClient.copyModeChanged(mIsSelectingText);
+        mClient.copyModeChanged(true);
 
         invalidate();
     }
@@ -884,7 +884,7 @@ public final class TerminalView extends View {
             mSelX1 = mSelY1 = mSelX2 = mSelY2 = -1;
             mIsSelectingText = false;
 
-            mClient.copyModeChanged(mIsSelectingText);
+            mClient.copyModeChanged(false);
 
             invalidate();
         }
@@ -954,12 +954,6 @@ public final class TerminalView extends View {
          */
         boolean onTouchEvent(MotionEvent event);
 
-        /**
-         * Called when the view is detached from window. Perform house keeping task, such as
-         * stopping Runnable thread that would otherwise keep a reference on the context, thus
-         * preventing the activity to be recycled.
-         */
-        void onDetached();
     }
 
     private class HandleView extends View {
@@ -968,10 +962,10 @@ public final class TerminalView extends View {
         private final int mOrigOrient;
         int mHandleWidth;
         private Drawable mDrawable;
-        private PopupWindow mContainer;
+        private final PopupWindow mContainer;
         private int mPointX;
         private int mPointY;
-        private CursorController mController;
+        private final CursorController mController;
         private boolean mIsDragging;
         private float mTouchToWindowOffsetX;
         private float mTouchToWindowOffsetY;
@@ -1012,7 +1006,7 @@ public final class TerminalView extends View {
                     }
                     //
                     mDrawable = mSelectHandleLeft;
-                    handleWidth = mDrawable.getIntrinsicWidth();
+                    handleWidth = Objects.requireNonNull(mDrawable).getIntrinsicWidth();
                     mHotspotX = (handleWidth * 3) / 4;
                     break;
                 }
@@ -1023,7 +1017,7 @@ public final class TerminalView extends View {
                             R.drawable.text_select_handle_right_material);
                     }
                     mDrawable = mSelectHandleRight;
-                    handleWidth = mDrawable.getIntrinsicWidth();
+                    handleWidth = Objects.requireNonNull(mDrawable).getIntrinsicWidth();
                     mHotspotX = handleWidth / 4;
                     break;
                 }
@@ -1245,7 +1239,8 @@ public final class TerminalView extends View {
     private class SelectionModifierCursorController implements CursorController {
         private final int mHandleHeight;
         // The cursor controller images
-        private HandleView mStartHandle, mEndHandle;
+        private final HandleView mStartHandle;
+        private final HandleView mEndHandle;
         // Whether selection anchors are active
         private boolean mIsShowing;
 
@@ -1267,8 +1262,8 @@ public final class TerminalView extends View {
                     int show = MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT;
 
                     ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                    MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, 1, Menu.NONE, R.string.copy_text), show);
-                    MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, 2, Menu.NONE, R.string.paste_text).setEnabled(clipboard.hasPrimaryClip()), show);
+                    setShowAsAction(menu.add(Menu.NONE, 1, Menu.NONE, R.string.copy_text), show);
+                    setShowAsAction(menu.add(Menu.NONE, 2, Menu.NONE, R.string.paste_text).setEnabled(clipboard.hasPrimaryClip()), show);
                     menu.add(Menu.NONE, 3, Menu.NONE, R.string.text_selection_more);
                     return true;
                 }
@@ -1523,8 +1518,5 @@ public final class TerminalView extends View {
             }
         }
 
-        @Override
-        public void onDetached() {
-        }
     }
 }

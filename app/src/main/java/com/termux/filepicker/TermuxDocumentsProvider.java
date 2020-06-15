@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * A document provider for the Storage Access Framework which exposes the files in the
@@ -97,7 +98,7 @@ public class TermuxDocumentsProvider extends DocumentsProvider {
     }
 
     @Override
-    public Cursor queryRoots(String[] projection) throws FileNotFoundException {
+    public Cursor queryRoots(String[] projection) {
         final MatrixCursor result = new MatrixCursor(projection != null ? projection : DEFAULT_ROOT_PROJECTION);
         @SuppressWarnings("ConstantConditions") final String applicationName = getContext().getString(R.string.application_name);
 
@@ -124,7 +125,7 @@ public class TermuxDocumentsProvider extends DocumentsProvider {
     public Cursor queryChildDocuments(String parentDocumentId, String[] projection, String sortOrder) throws FileNotFoundException {
         final MatrixCursor result = new MatrixCursor(projection != null ? projection : DEFAULT_DOCUMENT_PROJECTION);
         final File parent = getFileForDocId(parentDocumentId);
-        for (File file : parent.listFiles()) {
+        for (File file : Objects.requireNonNull(parent.listFiles())) {
             if (!file.getName().startsWith(".")) {
                 includeFile(result, null, file);
             }
@@ -214,7 +215,7 @@ public class TermuxDocumentsProvider extends DocumentsProvider {
             final boolean isHidden = file.getName().startsWith(".");
             if (isInsideHome && !isHidden) {
                 if (file.isDirectory()) {
-                    Collections.addAll(pending, file.listFiles());
+                    Collections.addAll(pending, Objects.requireNonNull(file.listFiles()));
                 } else {
                     if (file.getName().toLowerCase().contains(query)) {
                         includeFile(result, null, file);
@@ -252,7 +253,7 @@ public class TermuxDocumentsProvider extends DocumentsProvider {
         } else if (file.canWrite()) {
             flags |= Document.FLAG_SUPPORTS_WRITE;
         }
-        if (file.getParentFile().canWrite()) flags |= Document.FLAG_SUPPORTS_DELETE;
+        if (Objects.requireNonNull(file.getParentFile()).canWrite()) flags |= Document.FLAG_SUPPORTS_DELETE;
 
         final String displayName = file.getName();
         final String mimeType = getMimeType(file);

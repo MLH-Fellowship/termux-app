@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class TermuxFileReceiverActivity extends AppCompatActivity {
@@ -74,8 +75,8 @@ public class TermuxFileReceiverActivity extends AppCompatActivity {
             handleContentUri(intent.getData(), intent.getStringExtra(Intent.EXTRA_TITLE));
         } else if ("file".equals(scheme)) {
             // When e.g. clicking on a downloaded apk:
-            String path = intent.getData().getPath();
-            File file = new File(path);
+            String path = Objects.requireNonNull(intent.getData()).getPath();
+            File file = new File(Objects.requireNonNull(path));
             try {
                 FileInputStream in = new FileInputStream(file);
                 promptNameAndSave(in, file.getName());

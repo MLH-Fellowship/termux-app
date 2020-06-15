@@ -59,7 +59,7 @@ public abstract class TerminalTestCase extends TestCase {
         }
     }
 
-    private TerminalTestCase assertInvariants() {
+    private void assertInvariants() {
         TerminalBuffer screen = mTerminal.getScreen();
         TerminalRow[] lines = screen.mLines;
 
@@ -95,7 +95,6 @@ public abstract class TerminalTestCase extends TestCase {
             assertEquals("The alt buffer should be the same size as the screen", mTerminal.mRows, mTerminal.mAltBuffer.mTotalRows);
         }
 
-        return this;
     }
 
     void assertLineIs(int line, String expected) {
@@ -128,14 +127,13 @@ public abstract class TerminalTestCase extends TestCase {
         return this;
     }
 
-    TerminalTestCase assertLineWraps(boolean... lines) {
+    void assertLineWraps(boolean... lines) {
         for (int i = 0; i < lines.length; i++)
             assertEquals("line=" + i, lines[i], mTerminal.getScreen().mLines[mTerminal.getScreen().externalToInternalRow(i)].mLineWrap);
-        return this;
     }
 
-    TerminalTestCase assertLineStartsWith(int line, int... codePoints) {
-        char[] chars = mTerminal.getScreen().mLines[mTerminal.getScreen().externalToInternalRow(line)].mText;
+    void assertLineStartsWith(int... codePoints) {
+        char[] chars = mTerminal.getScreen().mLines[mTerminal.getScreen().externalToInternalRow(0)].mText;
         int charIndex = 0;
         for (int i = 0; i < codePoints.length; i++) {
             int lineCodePoint = chars[charIndex++];
@@ -144,7 +142,6 @@ public abstract class TerminalTestCase extends TestCase {
             }
             assertEquals("Differing a code point index=" + i, codePoints[i], lineCodePoint);
         }
-        return this;
     }
 
     TerminalTestCase placeCursorAndAssert(int row, int col) {
@@ -173,7 +170,7 @@ public abstract class TerminalTestCase extends TestCase {
         return new EffectLine(bits);
     }
 
-    TerminalTestCase assertEffectAttributesSet(EffectLine... lines) {
+    void assertEffectAttributesSet(EffectLine... lines) {
         assertEquals(lines.length, mTerminal.getScreen().mScreenRows);
         for (int i = 0; i < lines.length; i++) {
             int[] line = lines[i].styles;
@@ -185,10 +182,9 @@ public abstract class TerminalTestCase extends TestCase {
                         + describeStyle(attributes) + " set, was " + describeStyle(effectsAtCell));
             }
         }
-        return this;
     }
 
-    TerminalTestCase assertForegroundIndices(EffectLine... lines) {
+    void assertForegroundIndices(EffectLine... lines) {
         assertEquals(lines.length, mTerminal.getScreen().mScreenRows);
         for (int i = 0; i < lines.length; i++) {
             int[] line = lines[i].styles;
@@ -200,11 +196,10 @@ public abstract class TerminalTestCase extends TestCase {
                         + Integer.toHexString(expectedColor) + " set, was " + Integer.toHexString(actualColor));
             }
         }
-        return this;
     }
 
-    void assertForegroundColorAt(int externalRow, int column, int color) {
-        long style = mTerminal.getScreen().mLines[mTerminal.getScreen().externalToInternalRow(externalRow)].getStyle(column);
+    void assertForegroundColorAt(int externalRow, int color) {
+        long style = mTerminal.getScreen().mLines[mTerminal.getScreen().externalToInternalRow(externalRow)].getStyle(0);
         assertEquals(color, TextStyle.decodeForeColor(style));
     }
 
@@ -301,7 +296,7 @@ public abstract class TerminalTestCase extends TestCase {
         }
     }
 
-    protected static class EffectLine {
+    static class EffectLine {
         final int[] styles;
 
         EffectLine(int[] styles) {

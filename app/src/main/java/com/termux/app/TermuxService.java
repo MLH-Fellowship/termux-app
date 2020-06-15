@@ -66,7 +66,7 @@ public final class TermuxService extends Service implements SessionChangedCallba
     /**
      * The terminal sessions which this service manages.
      * <p/>
-     * Note that this list is observed by {@link TermuxActivity#mListViewAdapter}, so any changes must be made on the UI
+     * Note that this list is observed by , so any changes must be made on the UI
      * thread and followed by a call to {@link ArrayAdapter#notifyDataSetChanged()} }.
      */
     private final List<TerminalSession> mTerminalSessions = new ArrayList<>();

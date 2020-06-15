@@ -24,6 +24,7 @@ import com.termux.view.TerminalView;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -67,7 +68,7 @@ public final class ExtraKeysView extends GridLayout {
     private static final int BUTTON_COLOR = 0x00000000;
     private static final int INTERESTING_COLOR = 0xFF80DEEA;
     private static final int BUTTON_PRESSED_COLOR = 0xFF7F7F7F;
-    private Map<SpecialButton, SpecialButtonState> specialButtons = new HashMap<SpecialButton, SpecialButtonState>() {{
+    private final Map<SpecialButton, SpecialButtonState> specialButtons = new HashMap<SpecialButton, SpecialButtonState>() {{
         put(SpecialButton.CTRL, new SpecialButtonState());
         put(SpecialButton.ALT, new SpecialButtonState());
         put(SpecialButton.FN, new SpecialButtonState());
@@ -111,9 +112,7 @@ public final class ExtraKeysView extends GridLayout {
             terminalView.onKeyDown(keyCode, keyEvent);
         } else {
             // not a control char
-            keyName.codePoints().forEach(codePoint -> {
-                terminalView.inputCodePoint(codePoint, forceCtrlDown, forceLeftAltDown);
-            });
+            keyName.codePoints().forEach(codePoint -> terminalView.inputCodePoint(codePoint, forceCtrlDown, forceLeftAltDown));
         }
     }
 
@@ -221,7 +220,7 @@ public final class ExtraKeysView extends GridLayout {
                 Button button;
                 if (Arrays.asList("CTRL", "ALT", "FN").contains(buttonInfo.getKey())) {
                     SpecialButtonState state = specialButtons.get(SpecialButton.valueOf(buttonInfo.getKey())); // for valueOf: https://stackoverflow.com/a/604426/1980630
-                    state.isOn = true;
+                    Objects.requireNonNull(state).isOn = true;
                     button = state.button = new ToggleButton(getContext(), null, android.R.attr.buttonBarButtonStyle);
                     button.setClickable(true);
                 } else {
@@ -249,6 +248,7 @@ public final class ExtraKeysView extends GridLayout {
 
                     View root = getRootView();
                     if (Arrays.asList("CTRL", "ALT", "FN").contains(buttonInfo.getKey())) {
+                        assert finalButton instanceof ToggleButton;
                         ToggleButton self = (ToggleButton) finalButton;
                         self.setChecked(self.isChecked());
                         self.setTextColor(self.isChecked() ? INTERESTING_COLOR : TEXT_COLOR);

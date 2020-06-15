@@ -26,7 +26,7 @@ final class BackgroundJob {
 
     private static final String LOG_TAG = "termux-task";
 
-    final Process mProcess;
+    private final Process mProcess;
 
     public BackgroundJob(String cwd, String fileToExecute, final String[] args, final TermuxService service) {
         this(cwd, fileToExecute, args, service, null);
@@ -180,7 +180,7 @@ final class BackgroundJob {
         return false;
     }
 
-    public static int getPid(Process p) {
+    private static int getPid(Process p) {
         try {
             Field f = p.getClass().getDeclaredField("pid");
             f.setAccessible(true);

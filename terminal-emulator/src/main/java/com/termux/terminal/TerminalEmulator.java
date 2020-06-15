@@ -762,9 +762,8 @@ public final class TerminalEmulator {
                                                 effectiveLeftMargin, effectiveRightMargin, top, left, bottom, right);
                                         }
                                     }
-                                } else {
-                                    // Do nothing.
-                                }
+                                }  // Do nothing.
+
                                 break;
                             default:
                                 unknownSequence(b);
@@ -1938,7 +1937,7 @@ public final class TerminalEmulator {
                         }
                     } else if (parsingPairStart >= 0) {
                         // We have passed a color index and are now going through color spec.
-                    } else if (parsingPairStart < 0 && (b >= '0' && b <= '9')) {
+                    } else if (b >= '0' && b <= '9') {
                         colorIndex = ((colorIndex < 0) ? 0 : colorIndex * 10) + (b - '0');
                     } else {
                         unknownSequence(b);

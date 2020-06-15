@@ -16,12 +16,9 @@ public class BellUtil {
     private long lastBell = 0;
 
     private BellUtil(final Vibrator vibrator) {
-        bellRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (vibrator != null) {
-                    vibrator.vibrate(DURATION);
-                }
+        bellRunnable = () -> {
+            if (vibrator != null) {
+                vibrator.vibrate(DURATION);
             }
         };
     }

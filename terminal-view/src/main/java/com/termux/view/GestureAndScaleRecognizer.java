@@ -106,7 +106,7 @@ final class GestureAndScaleRecognizer {
 
         boolean onDown(float x, float y);
 
-        boolean onUp(MotionEvent e);
+        void onUp(MotionEvent e);
 
         void onLongPress(MotionEvent e);
     }

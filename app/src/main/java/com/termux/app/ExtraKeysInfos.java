@@ -1,6 +1,9 @@
 package com.termux.app;
 
+import android.os.Build;
+
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -137,7 +140,7 @@ class ExtraKeysInfos {
     /**
      * This corresponds to one of the CharMapDisplay below
      */
-    private String style = "default";
+    private String style;
 
     /**
      * Multiple maps are available to quickly change
@@ -267,44 +270,19 @@ class ExtraKeyButton {
      * The information of the popup (triggered by swipe up).
      */
     @Nullable
-    private ExtraKeyButton popup = null;
+    private ExtraKeyButton popup;
 
     public ExtraKeyButton(ExtraKeysInfos.CharDisplayMap charDisplayMap, JSONObject config) throws JSONException {
         this(charDisplayMap, config, null);
     }
 
-    public ExtraKeyButton(ExtraKeysInfos.CharDisplayMap charDisplayMap, JSONObject config, ExtraKeyButton popup) throws JSONException {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public ExtraKeyButton(ExtraKeysInfos.CharDisplayMap charDisplayMap, JSONObject config, @Nullable ExtraKeyButton popup) throws JSONException {
         String keyFromConfig = config.optString("key", null);
         String macroFromConfig = config.optString("macro", null);
         String[] keys;
-        if (keyFromConfig != null && macroFromConfig != null) {
-            throw new JSONException("Both key and macro can't be set for the same key");
-        } else if (keyFromConfig != null) {
-            keys = new String[]{keyFromConfig};
-            this.macro = false;
-        } else if (macroFromConfig != null) {
-            keys = macroFromConfig.split(" ");
-            this.macro = true;
-        } else {
-            throw new JSONException("All keys have to specify either key or macro");
-        }
+        throw new JSONException("Both key and macro can't be set for the same key");
 
-        for (int i = 0; i < keys.length; i++) {
-            keys[i] = ExtraKeysInfos.replaceAlias(keys[i]);
-        }
-
-        this.key = String.join(" ", keys);
-
-        String displayFromConfig = config.optString("display", null);
-        if (displayFromConfig != null) {
-            this.display = displayFromConfig;
-        } else {
-            this.display = Arrays.stream(keys)
-                .map(key -> charDisplayMap.get(key, key))
-                .collect(Collectors.joining(" "));
-        }
-
-        this.popup = popup;
     }
 
     public String getKey() {

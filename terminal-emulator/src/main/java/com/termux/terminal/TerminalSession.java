@@ -8,6 +8,8 @@ import android.system.Os;
 import android.system.OsConstants;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -75,38 +77,42 @@ public final class TerminalSession extends TerminalOutput {
      */
     private int mTerminalFileDescriptor;
     @SuppressLint("HandlerLeak")
-    private final Handler mMainThreadHandler = new Handler() {
-        final byte[] mReceiveBuffer = new byte[4 * 1024];
+    private final Handler mMainThreadHandler;
 
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == MSG_NEW_INPUT && isRunning()) {
-                int bytesRead = mProcessToTerminalIOQueue.read(mReceiveBuffer, false);
-                if (bytesRead > 0) {
-                    mEmulator.append(mReceiveBuffer, bytesRead);
+    {
+        mMainThreadHandler = new Handler() {
+            final byte[] mReceiveBuffer = new byte[4 * 1024];
+
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                if (msg.what == MSG_NEW_INPUT && isRunning()) {
+                    int bytesRead = mProcessToTerminalIOQueue.read(mReceiveBuffer, false);
+                    if (bytesRead > 0) {
+                        mEmulator.append(mReceiveBuffer, bytesRead);
+                        notifyScreenUpdate();
+                    }
+                } else if (msg.what == MSG_PROCESS_EXITED) {
+                    int exitCode = (Integer) msg.obj;
+                    cleanupResources(exitCode);
+                    mChangeCallback.onSessionFinished(TerminalSession.this);
+
+                    String exitDescription = "\r\n[Process completed";
+                    if (exitCode > 0) {
+                        // Non-zero process exit.
+                        exitDescription += " (code " + exitCode + ")";
+                    } else if (exitCode < 0) {
+                        // Negated signal.
+                        exitDescription += " (signal " + (-exitCode) + ")";
+                    }
+                    exitDescription += " - press Enter]";
+
+                    byte[] bytesToWrite = exitDescription.getBytes(StandardCharsets.UTF_8);
+                    mEmulator.append(bytesToWrite, bytesToWrite.length);
                     notifyScreenUpdate();
                 }
-            } else if (msg.what == MSG_PROCESS_EXITED) {
-                int exitCode = (Integer) msg.obj;
-                cleanupResources(exitCode);
-                mChangeCallback.onSessionFinished(TerminalSession.this);
-
-                String exitDescription = "\r\n[Process completed";
-                if (exitCode > 0) {
-                    // Non-zero process exit.
-                    exitDescription += " (code " + exitCode + ")";
-                } else if (exitCode < 0) {
-                    // Negated signal.
-                    exitDescription += " (signal " + (-exitCode) + ")";
-                }
-                exitDescription += " - press Enter]";
-
-                byte[] bytesToWrite = exitDescription.getBytes(StandardCharsets.UTF_8);
-                mEmulator.append(bytesToWrite, bytesToWrite.length);
-                notifyScreenUpdate();
             }
-        }
-    };
+        };
+    }
 
     public TerminalSession(String shellPath, String cwd, String[] args, String[] env, SessionChangedCallback changeCallback) {
         mChangeCallback = changeCallback;

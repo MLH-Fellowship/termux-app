@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 final class TermuxPreferences {
@@ -69,7 +70,7 @@ final class TermuxPreferences {
         if (defaultFontSize % 2 == 1) defaultFontSize--;
 
         try {
-            mFontSize = Integer.parseInt(prefs.getString(FONTSIZE_KEY, Integer.toString(defaultFontSize)));
+            mFontSize = Integer.parseInt(Objects.requireNonNull(prefs.getString(FONTSIZE_KEY, Integer.toString(defaultFontSize))));
         } catch (NumberFormatException | ClassCastException e) {
             mFontSize = defaultFontSize;
         }

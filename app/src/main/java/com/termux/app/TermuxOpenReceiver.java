@@ -21,6 +21,7 @@ import com.termux.terminal.EmulatorDebug;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Objects;
 
 public class TermuxOpenReceiver extends BroadcastReceiver {
 
@@ -64,7 +65,7 @@ public class TermuxOpenReceiver extends BroadcastReceiver {
             return;
         }
 
-        final File fileToShare = new File(filePath);
+        final File fileToShare = new File(Objects.requireNonNull(filePath));
         if (!(fileToShare.isFile() && fileToShare.canRead())) {
             Log.e(EmulatorDebug.LOG_TAG, "termux-open: Not a readable file: '" + fileToShare.getAbsolutePath() + "'");
             return;
@@ -116,7 +117,7 @@ public class TermuxOpenReceiver extends BroadcastReceiver {
 
         @Override
         public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-            File file = new File(uri.getPath());
+            File file = new File(Objects.requireNonNull(uri.getPath()));
 
             if (projection == null) {
                 projection = new String[]{
@@ -173,7 +174,7 @@ public class TermuxOpenReceiver extends BroadcastReceiver {
 
         @Override
         public ParcelFileDescriptor openFile(@NonNull Uri uri, @NonNull String mode) throws FileNotFoundException {
-            File file = new File(uri.getPath());
+            File file = new File(Objects.requireNonNull(uri.getPath()));
             try {
                 String path = file.getCanonicalPath();
                 String storagePath = Environment.getExternalStorageDirectory().getCanonicalPath();

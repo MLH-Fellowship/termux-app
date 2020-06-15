@@ -64,6 +64,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -523,7 +524,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 }
 
                 TerminalSession sessionAtRow = getItem(position);
-                boolean sessionRunning = sessionAtRow.isRunning();
+                boolean sessionRunning = Objects.requireNonNull(sessionAtRow).isRunning();
 
                 TextView firstLineView = row.findViewById(R.id.row_line);
                 if (mIsUsingBlackUI) {
@@ -564,7 +565,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         });
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             final TerminalSession selectedSession = mListViewAdapter.getItem(position);
-            renameSession(selectedSession);
+            renameSession(Objects.requireNonNull(selectedSession));
             return true;
         });
 
@@ -757,7 +758,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
     void showUrlSelection() {
-        String text = getCurrentTermSession().getEmulator().getScreen().getTranscriptTextWithFullLinesJoined();
+        String text = Objects.requireNonNull(getCurrentTermSession()).getEmulator().getScreen().getTranscriptTextWithFullLinesJoined();
         LinkedHashSet<CharSequence> urlSet = extractUrls(text);
         if (urlSet.isEmpty()) {
             new AlertDialog.Builder(this).setMessage(R.string.select_url_no_found).show();
@@ -832,7 +833,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                 b.setMessage(R.string.confirm_kill_process);
                 b.setPositiveButton(android.R.string.yes, (dialog, id) -> {
                     dialog.dismiss();
-                    getCurrentTermSession().finishIfRunning();
+                    Objects.requireNonNull(getCurrentTermSession()).finishIfRunning();
                 });
                 b.setNegativeButton(android.R.string.no, null);
                 b.show();
@@ -893,7 +894,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         if (clipData == null) return;
         CharSequence paste = clipData.getItemAt(0).coerceToText(this);
         if (!TextUtils.isEmpty(paste))
-            getCurrentTermSession().getEmulator().paste(paste.toString());
+            Objects.requireNonNull(getCurrentTermSession()).getEmulator().paste(paste.toString());
     }
 
     /**

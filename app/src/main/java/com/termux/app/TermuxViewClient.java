@@ -16,6 +16,7 @@ import com.termux.terminal.TerminalSession;
 import com.termux.view.TerminalViewClient;
 
 import java.util.List;
+import java.util.Objects;
 
 public final class TermuxViewClient implements TerminalViewClient {
 
@@ -220,7 +221,7 @@ public final class TermuxViewClient implements TerminalViewClient {
 
             if (resultingKeyCode != -1) {
                 TerminalEmulator term = session.getEmulator();
-                session.write(KeyHandler.getCode(resultingKeyCode, 0, term.isCursorKeysApplicationMode(), term.isKeypadApplicationMode()));
+                session.write(Objects.requireNonNull(KeyHandler.getCode(resultingKeyCode, 0, term.isCursorKeysApplicationMode(), term.isKeypadApplicationMode())));
             } else if (resultingCodePoint != -1) {
                 session.writeCodePoint(altDown, resultingCodePoint);
             }
@@ -248,7 +249,7 @@ public final class TermuxViewClient implements TerminalViewClient {
                                 mActivity.switchToSession(true);
                                 return true;
                             case TermuxPreferences.SHORTCUT_ACTION_RENAME_SESSION:
-                                mActivity.renameSession(mActivity.getCurrentTermSession());
+                                mActivity.renameSession(Objects.requireNonNull(mActivity.getCurrentTermSession()));
                                 return true;
                         }
                     }

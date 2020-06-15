@@ -10,8 +10,8 @@
 
     <rect fill="#0" height="100%" width="100%" />
 
-    <text style="fill: #ffffff; font-size: 210px; font-family: Menlo, Monospace;" id="shell_prompt" x="200"
-        y="410">
+    <text style="fill: #ffffff; font-size: 210px; font-family: Menlo, Monospace;" id="shell_prompt"
+        x="200" y="410">
         <tspan>Termux ▌</tspan>
     </text>
 

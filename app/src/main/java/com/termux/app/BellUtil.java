@@ -14,6 +14,7 @@ public class BellUtil {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable bellRunnable;
     private long lastBell = 0;
+
     private BellUtil(final Vibrator vibrator) {
         bellRunnable = new Runnable() {
             @Override

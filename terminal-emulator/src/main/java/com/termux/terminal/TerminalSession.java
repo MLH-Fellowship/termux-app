@@ -107,6 +107,7 @@ public final class TerminalSession extends TerminalOutput {
             }
         }
     };
+
     public TerminalSession(String shellPath, String cwd, String[] args, String[] env, SessionChangedCallback changeCallback) {
         mChangeCallback = changeCallback;
 

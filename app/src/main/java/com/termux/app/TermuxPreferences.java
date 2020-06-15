@@ -229,6 +229,7 @@ final class TermuxPreferences {
 
         final int codePoint;
         final int shortcutAction;
+
         KeyboardShortcut(int codePoint, int shortcutAction) {
             this.codePoint = codePoint;
             this.shortcutAction = shortcutAction;

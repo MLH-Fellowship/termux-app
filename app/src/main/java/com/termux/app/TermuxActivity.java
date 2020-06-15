@@ -2,7 +2,6 @@ package com.termux.app;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -21,7 +20,6 @@ import android.graphics.Typeface;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.SpannableString;
@@ -45,6 +43,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.termux.R;
 import com.termux.terminal.EmulatorDebug;
 import com.termux.terminal.TerminalColors;
@@ -63,12 +67,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
 /**
  * A terminal emulator activity.
@@ -98,42 +96,36 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
     private static final int REQUESTCODE_PERMISSION_STORAGE = 1234;
 
     private static final String RELOAD_STYLE_ACTION = "com.termux.app.reload_style";
-
-    /** The main view of the activity showing the terminal. Initialized in onCreate(). */
+    final SoundPool mBellSoundPool = new SoundPool.Builder().setMaxStreams(1).setAudioAttributes(
+        new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION).build()).build();
+    /**
+     * The main view of the activity showing the terminal. Initialized in onCreate().
+     */
     @SuppressWarnings("NullableProblems")
     @NonNull
     TerminalView mTerminalView;
-
     ExtraKeysView mExtraKeysView;
-
     TermuxPreferences mSettings;
-
     /**
      * The connection to the {@link TermuxService}. Requested in {@link #onCreate(Bundle)} with a call to
      * {@link #bindService(Intent, ServiceConnection, int)}, and obtained and stored in
      * {@link #onServiceConnected(ComponentName, IBinder)}.
      */
     TermuxService mTermService;
-
-    /** Initialized in {@link #onServiceConnected(ComponentName, IBinder)}. */
+    /**
+     * Initialized in {@link #onServiceConnected(ComponentName, IBinder)}.
+     */
     ArrayAdapter<TerminalSession> mListViewAdapter;
-
-    /** The last toast shown, used cancel current toast before showing new in {@link #showToast(String, boolean)}. */
+    /**
+     * The last toast shown, used cancel current toast before showing new in {@link #showToast(String, boolean)}.
+     */
     Toast mLastToast;
-
     /**
      * If between onResume() and onStop(). Note that only one session is in the foreground of the terminal view at the
      * time, so if the session causing a change is not in the foreground it should probably be treated as background.
      */
     boolean mIsVisible;
-
-    boolean mIsUsingBlackUI;
-
-    final SoundPool mBellSoundPool = new SoundPool.Builder().setMaxStreams(1).setAudioAttributes(
-        new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION).build()).build();
-    int mBellSoundId;
-
     private final BroadcastReceiver mBroadcastReceiever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -153,6 +145,95 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
             }
         }
     };
+    boolean mIsUsingBlackUI;
+    int mBellSoundId;
+
+    static LinkedHashSet<CharSequence> extractUrls(String text) {
+
+        StringBuilder regex_sb = new StringBuilder();
+
+        regex_sb.append("(");                       // Begin first matching group.
+        regex_sb.append("(?:");                     // Begin scheme group.
+        regex_sb.append("dav|");                    // The DAV proto.
+        regex_sb.append("dict|");                   // The DICT proto.
+        regex_sb.append("dns|");                    // The DNS proto.
+        regex_sb.append("file|");                   // File path.
+        regex_sb.append("finger|");                 // The Finger proto.
+        regex_sb.append("ftp(?:s?)|");              // The FTP proto.
+        regex_sb.append("git|");                    // The Git proto.
+        regex_sb.append("gopher|");                 // The Gopher proto.
+        regex_sb.append("http(?:s?)|");             // The HTTP proto.
+        regex_sb.append("imap(?:s?)|");             // The IMAP proto.
+        regex_sb.append("irc(?:[6s]?)|");           // The IRC proto.
+        regex_sb.append("ip[fn]s|");                // The IPFS proto.
+        regex_sb.append("ldap(?:s?)|");             // The LDAP proto.
+        regex_sb.append("pop3(?:s?)|");             // The POP3 proto.
+        regex_sb.append("redis(?:s?)|");            // The Redis proto.
+        regex_sb.append("rsync|");                  // The Rsync proto.
+        regex_sb.append("rtsp(?:[su]?)|");          // The RTSP proto.
+        regex_sb.append("sftp|");                   // The SFTP proto.
+        regex_sb.append("smb(?:s?)|");              // The SAMBA proto.
+        regex_sb.append("smtp(?:s?)|");             // The SMTP proto.
+        regex_sb.append("svn(?:(?:\\+ssh)?)|");     // The Subversion proto.
+        regex_sb.append("tcp|");                    // The TCP proto.
+        regex_sb.append("telnet|");                 // The Telnet proto.
+        regex_sb.append("tftp|");                   // The TFTP proto.
+        regex_sb.append("udp|");                    // The UDP proto.
+        regex_sb.append("vnc|");                    // The VNC proto.
+        regex_sb.append("ws(?:s?)");                // The Websocket proto.
+        regex_sb.append(")://");                    // End scheme group.
+        regex_sb.append(")");                       // End first matching group.
+
+
+        // Begin second matching group.
+        regex_sb.append("(");
+
+        // User name and/or password in format 'user:pass@'.
+        regex_sb.append("(?:\\S+(?::\\S*)?@)?");
+
+        // Begin host group.
+        regex_sb.append("(?:");
+
+        // IP address (from http://www.regular-expressions.info/examples.html).
+        regex_sb.append("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|");
+
+        // Host name or domain.
+        regex_sb.append("(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)(?:(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))?|");
+
+        // Just path. Used in case of 'file://' scheme.
+        regex_sb.append("/(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)");
+
+        // End host group.
+        regex_sb.append(")");
+
+        // Port number.
+        regex_sb.append("(?::\\d{1,5})?");
+
+        // Resource path with optional query string.
+        regex_sb.append("(?:/[a-zA-Z0-9:@%\\-._~!$&()*+,;=?/]*)?");
+
+        // Fragment.
+        regex_sb.append("(?:#[a-zA-Z0-9:@%\\-._~!$&()*+,;=?/]*)?");
+
+        // End second matching group.
+        regex_sb.append(")");
+
+        final Pattern urlPattern = Pattern.compile(
+            regex_sb.toString(),
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+
+        LinkedHashSet<CharSequence> urlSet = new LinkedHashSet<>();
+        Matcher matcher = urlPattern.matcher(text);
+
+        while (matcher.find()) {
+            int matchStart = matcher.start(1);
+            int matchEnd = matcher.end();
+            String url = text.substring(matchStart, matchEnd);
+            urlSet.add(url);
+        }
+
+        return urlSet;
+    }
 
     void checkForFontAndColors() {
         try {
@@ -187,7 +268,9 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
         }
     }
 
-    /** For processes to access shared internal storage (/sdcard) we need this permission. */
+    /**
+     * For processes to access shared internal storage (/sdcard) we need this permission.
+     */
     public boolean ensureStoragePermissionGranted() {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             return true;
@@ -614,7 +697,9 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
         }
     }
 
-    /** Try switching to session and note about it, but do nothing if already displaying the session. */
+    /**
+     * Try switching to session and note about it, but do nothing if already displaying the session.
+     */
     void switchToSession(TerminalSession session) {
         if (mTerminalView.attachSession(session)) {
             noteSessionInfo();
@@ -662,98 +747,13 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
         menu.add(Menu.NONE, CONTEXTMENU_HELP_ID, Menu.NONE, R.string.help);
     }
 
-    /** Hook system menu to show context menu instead. */
+    /**
+     * Hook system menu to show context menu instead.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mTerminalView.showContextMenu();
         return false;
-    }
-
-    static LinkedHashSet<CharSequence> extractUrls(String text) {
-
-        StringBuilder regex_sb = new StringBuilder();
-
-        regex_sb.append("(");                       // Begin first matching group.
-        regex_sb.append("(?:");                     // Begin scheme group.
-        regex_sb.append("dav|");                    // The DAV proto.
-        regex_sb.append("dict|");                   // The DICT proto.
-        regex_sb.append("dns|");                    // The DNS proto.
-        regex_sb.append("file|");                   // File path.
-        regex_sb.append("finger|");                 // The Finger proto.
-        regex_sb.append("ftp(?:s?)|");              // The FTP proto.
-        regex_sb.append("git|");                    // The Git proto.
-        regex_sb.append("gopher|");                 // The Gopher proto.
-        regex_sb.append("http(?:s?)|");             // The HTTP proto.
-        regex_sb.append("imap(?:s?)|");             // The IMAP proto.
-        regex_sb.append("irc(?:[6s]?)|");           // The IRC proto.
-        regex_sb.append("ip[fn]s|");                // The IPFS proto.
-        regex_sb.append("ldap(?:s?)|");             // The LDAP proto.
-        regex_sb.append("pop3(?:s?)|");             // The POP3 proto.
-        regex_sb.append("redis(?:s?)|");            // The Redis proto.
-        regex_sb.append("rsync|");                  // The Rsync proto.
-        regex_sb.append("rtsp(?:[su]?)|");          // The RTSP proto.
-        regex_sb.append("sftp|");                   // The SFTP proto.
-        regex_sb.append("smb(?:s?)|");              // The SAMBA proto.
-        regex_sb.append("smtp(?:s?)|");             // The SMTP proto.
-        regex_sb.append("svn(?:(?:\\+ssh)?)|");     // The Subversion proto.
-        regex_sb.append("tcp|");                    // The TCP proto.
-        regex_sb.append("telnet|");                 // The Telnet proto.
-        regex_sb.append("tftp|");                   // The TFTP proto.
-        regex_sb.append("udp|");                    // The UDP proto.
-        regex_sb.append("vnc|");                    // The VNC proto.
-        regex_sb.append("ws(?:s?)");                // The Websocket proto.
-        regex_sb.append(")://");                    // End scheme group.
-        regex_sb.append(")");                       // End first matching group.
-
-
-        // Begin second matching group.
-        regex_sb.append("(");
-
-        // User name and/or password in format 'user:pass@'.
-        regex_sb.append("(?:\\S+(?::\\S*)?@)?");
-
-        // Begin host group.
-        regex_sb.append("(?:");
-
-        // IP address (from http://www.regular-expressions.info/examples.html).
-        regex_sb.append("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|");
-
-        // Host name or domain.
-        regex_sb.append("(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)(?:(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))?|");
-
-        // Just path. Used in case of 'file://' scheme.
-        regex_sb.append("/(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)");
-
-        // End host group.
-        regex_sb.append(")");
-
-        // Port number.
-        regex_sb.append("(?::\\d{1,5})?");
-
-        // Resource path with optional query string.
-        regex_sb.append("(?:/[a-zA-Z0-9:@%\\-._~!$&()*+,;=?/]*)?");
-
-        // Fragment.
-        regex_sb.append("(?:#[a-zA-Z0-9:@%\\-._~!$&()*+,;=?/]*)?");
-
-        // End second matching group.
-        regex_sb.append(")");
-
-        final Pattern urlPattern = Pattern.compile(
-            regex_sb.toString(),
-            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
-
-        LinkedHashSet<CharSequence> urlSet = new LinkedHashSet<>();
-        Matcher matcher = urlPattern.matcher(text);
-
-        while (matcher.find()) {
-            int matchStart = matcher.start(1);
-            int matchEnd = matcher.end();
-            String url = text.substring(matchStart, matchEnd);
-            urlSet.add(url);
-        }
-
-        return urlSet;
     }
 
     void showUrlSelection() {
@@ -861,7 +861,7 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
                 startActivity(new Intent(this, TermuxHelpActivity.class));
                 return true;
             case CONTEXTMENU_TOGGLE_KEEP_SCREEN_ON: {
-                if(mTerminalView.getKeepScreenOn()) {
+                if (mTerminalView.getKeepScreenOn()) {
                     mTerminalView.setKeepScreenOn(false);
                     mSettings.setScreenAlwaysOn(this, false);
                 } else {
@@ -896,7 +896,9 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
             getCurrentTermSession().getEmulator().paste(paste.toString());
     }
 
-    /** The current session as stored or the last one if that does not exist. */
+    /**
+     * The current session as stored or the last one if that does not exist.
+     */
     public TerminalSession getStoredCurrentSessionOrLast() {
         TerminalSession stored = TermuxPreferences.getCurrentSession(this);
         if (stored != null) return stored;
@@ -904,7 +906,9 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
         return sessions.isEmpty() ? null : sessions.get(sessions.size() - 1);
     }
 
-    /** Show a toast and dismiss the last one if still visible. */
+    /**
+     * Show a toast and dismiss the last one if still visible.
+     */
     void showToast(String text, boolean longDuration) {
         if (mLastToast != null) mLastToast.cancel();
         mLastToast = Toast.makeText(TermuxActivity.this, text, longDuration ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);

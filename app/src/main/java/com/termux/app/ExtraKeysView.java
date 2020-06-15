@@ -5,15 +5,6 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.AttributeSet;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ScheduledExecutorService;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
-
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
@@ -25,25 +16,23 @@ import android.widget.GridLayout;
 import android.widget.PopupWindow;
 import android.widget.ToggleButton;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.termux.R;
 import com.termux.view.TerminalView;
 
-import androidx.drawerlayout.widget.DrawerLayout;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A view showing extra keys (such as Escape, Ctrl, Alt) not normally available on an Android soft
  * keyboard.
  */
 public final class ExtraKeysView extends GridLayout {
-
-    private static final int TEXT_COLOR = 0xFFFFFFFF;
-    private static final int BUTTON_COLOR = 0x00000000;
-    private static final int INTERESTING_COLOR = 0xFF80DEEA;
-    private static final int BUTTON_PRESSED_COLOR = 0xFF7F7F7F;
-
-    public ExtraKeysView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
 
     static final Map<String, Integer> keyCodesForString = new HashMap<String, Integer>() {{
         put("SPACE", KeyEvent.KEYCODE_SPACE);
@@ -74,6 +63,32 @@ public final class ExtraKeysView extends GridLayout {
         put("F11", KeyEvent.KEYCODE_F11);
         put("F12", KeyEvent.KEYCODE_F12);
     }};
+    private static final int TEXT_COLOR = 0xFFFFFFFF;
+    private static final int BUTTON_COLOR = 0x00000000;
+    private static final int INTERESTING_COLOR = 0xFF80DEEA;
+    private static final int BUTTON_PRESSED_COLOR = 0xFF7F7F7F;
+    private Map<SpecialButton, SpecialButtonState> specialButtons = new HashMap<SpecialButton, SpecialButtonState>() {{
+        put(SpecialButton.CTRL, new SpecialButtonState());
+        put(SpecialButton.ALT, new SpecialButtonState());
+        put(SpecialButton.FN, new SpecialButtonState());
+    }};
+    private ScheduledExecutorService scheduledExecutor;
+    private PopupWindow popupWindow;
+    private int longPressCount;
+
+    public ExtraKeysView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    /**
+     * General util function to compute the longest column length in a matrix.
+     */
+    static int maximumLength(Object[][] matrix) {
+        int m = 0;
+        for (Object[] row : matrix)
+            m = Math.max(m, row.length);
+        return m;
+    }
 
     private void sendKey(View view, String keyName, boolean forceCtrlDown, boolean forceLeftAltDown) {
         TerminalView terminalView = view.findViewById(R.id.terminal_view);
@@ -123,31 +138,12 @@ public final class ExtraKeysView extends GridLayout {
         }
     }
 
-    public enum SpecialButton {
-        CTRL, ALT, FN
-    }
-
-    private static class SpecialButtonState {
-        boolean isOn = false;
-        ToggleButton button = null;
-    }
-
-    private Map<SpecialButton, SpecialButtonState> specialButtons = new HashMap<SpecialButton, SpecialButtonState>() {{
-        put(SpecialButton.CTRL, new SpecialButtonState());
-        put(SpecialButton.ALT, new SpecialButtonState());
-        put(SpecialButton.FN, new SpecialButtonState());
-    }};
-
-    private ScheduledExecutorService scheduledExecutor;
-    private PopupWindow popupWindow;
-    private int longPressCount;
-
     public boolean readSpecialButton(SpecialButton name) {
         SpecialButtonState state = specialButtons.get(name);
         if (state == null)
             throw new RuntimeException("Must be a valid special button (see source)");
 
-        if (! state.isOn)
+        if (!state.isOn)
             return false;
 
         if (state.button == null) {
@@ -157,7 +153,7 @@ public final class ExtraKeysView extends GridLayout {
         if (state.button.isPressed())
             return true;
 
-        if (! state.button.isChecked())
+        if (!state.button.isChecked())
             return false;
 
         state.button.setChecked(false);
@@ -189,36 +185,26 @@ public final class ExtraKeysView extends GridLayout {
     }
 
     /**
-     * General util function to compute the longest column length in a matrix.
-     */
-    static int maximumLength(Object[][] matrix) {
-        int m = 0;
-        for (Object[] row : matrix)
-            m = Math.max(m, row.length);
-        return m;
-    }
-
-    /**
      * Reload the view given parameters in termux.properties
      *
      * @param infos matrix as defined in termux.properties extrakeys
-     * Can Contain The Strings CTRL ALT TAB FN ENTER LEFT RIGHT UP DOWN or normal strings
-     * Some aliases are possible like RETURN for ENTER, LT for LEFT and more (@see controlCharsAliases for the whole list).
-     * Any string of length > 1 in total Uppercase will print a warning
-     *
-     * Examples:
-     * "ENTER" will trigger the ENTER keycode
-     * "LEFT" will trigger the LEFT keycode and be displayed as "←"
-     * "→" will input a "→" character
-     * "−" will input a "−" character
-     * "-_-" will input the string "-_-"
+     *              Can Contain The Strings CTRL ALT TAB FN ENTER LEFT RIGHT UP DOWN or normal strings
+     *              Some aliases are possible like RETURN for ENTER, LT for LEFT and more (@see controlCharsAliases for the whole list).
+     *              Any string of length > 1 in total Uppercase will print a warning
+     *              <p>
+     *              Examples:
+     *              "ENTER" will trigger the ENTER keycode
+     *              "LEFT" will trigger the LEFT keycode and be displayed as "←"
+     *              "→" will input a "→" character
+     *              "−" will input a "−" character
+     *              "-_-" will input the string "-_-"
      */
     @SuppressLint("ClickableViewAccessibility")
     void reload(ExtraKeysInfos infos) {
-        if(infos == null)
+        if (infos == null)
             return;
 
-        for(SpecialButtonState state : specialButtons.values())
+        for (SpecialButtonState state : specialButtons.values())
             state.button = null;
 
         removeAllViews();
@@ -233,7 +219,7 @@ public final class ExtraKeysView extends GridLayout {
                 final ExtraKeyButton buttonInfo = buttons[row][col];
 
                 Button button;
-                if(Arrays.asList("CTRL", "ALT", "FN").contains(buttonInfo.getKey())) {
+                if (Arrays.asList("CTRL", "ALT", "FN").contains(buttonInfo.getKey())) {
                     SpecialButtonState state = specialButtons.get(SpecialButton.valueOf(buttonInfo.getKey())); // for valueOf: https://stackoverflow.com/a/604426/1980630
                     state.isOn = true;
                     button = state.button = new ToggleButton(getContext(), null, android.R.attr.buttonBarButtonStyle);
@@ -349,6 +335,15 @@ public final class ExtraKeysView extends GridLayout {
                 addView(button);
             }
         }
+    }
+
+    public enum SpecialButton {
+        CTRL, ALT, FN
+    }
+
+    private static class SpecialButtonState {
+        boolean isOn = false;
+        ToggleButton button = null;
     }
 
 }

@@ -1,22 +1,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_height="match_parent"
         android:layout_above="@+id/viewpager"
-        android:layout_height="match_parent">
+        android:layout_alignParentTop="true">
 
         <com.termux.view.TerminalView
             android:id="@+id/terminal_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginRight="3dp"
             android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:focusableInTouchMode="true"
             android:scrollbarThumbVertical="@drawable/terminal_scroll_shape"
             android:scrollbars="vertical" />
@@ -28,9 +28,9 @@
             android:layout_gravity="start"
             android:background="@android:color/white"
             android:choiceMode="singleChoice"
+            android:descendantFocusability="blocksDescendants"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
-            android:descendantFocusability="blocksDescendants"
             android:orientation="vertical">
 
             <ListView
@@ -70,9 +70,9 @@
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="37.5dp"
+        android:layout_alignParentBottom="true"
         android:background="@android:drawable/screen_background_dark_transparent"
-        android:layout_alignParentBottom="true" />
+        android:visibility="gone" />
 </RelativeLayout>

@@ -46,7 +46,9 @@ import java.util.zip.ZipInputStream;
  */
 final class TermuxInstaller {
 
-    /** Performs setup if necessary. */
+    /**
+     * Performs setup if necessary.
+     */
     static void setupIfNeeded(final Activity activity, final Runnable whenDone) {
         // Termux can only be run as the primary user (device owner) since only that
         // account has the expected file system paths. Verify that:
@@ -138,9 +140,9 @@ final class TermuxInstaller {
                                     dialog.dismiss();
                                     activity.finish();
                                 }).setPositiveButton(R.string.bootstrap_error_try_again, (dialog, which) -> {
-                                    dialog.dismiss();
-                                    TermuxInstaller.setupIfNeeded(activity, whenDone);
-                                }).show();
+                                dialog.dismiss();
+                                TermuxInstaller.setupIfNeeded(activity, whenDone);
+                            }).show();
                         } catch (WindowManager.BadTokenException e1) {
                             // Activity already dismissed - ignore.
                         }
@@ -172,7 +174,9 @@ final class TermuxInstaller {
 
     public static native byte[] getZip();
 
-    /** Delete a folder and all its content or throw. Don't follow symlinks. */
+    /**
+     * Delete a folder and all its content or throw. Don't follow symlinks.
+     */
     static void deleteFolder(File fileOrDirectory) throws IOException {
         if (fileOrDirectory.getCanonicalPath().equals(fileOrDirectory.getAbsolutePath()) && fileOrDirectory.isDirectory()) {
             File[] children = fileOrDirectory.listFiles();

@@ -14,13 +14,13 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import androidx.annotation.NonNull;
+
 import com.termux.terminal.EmulatorDebug;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import androidx.annotation.NonNull;
 
 public class TermuxOpenReceiver extends BroadcastReceiver {
 

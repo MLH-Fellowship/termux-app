@@ -10,19 +10,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-public class ExtraKeysInfos {
+class ExtraKeysInfos {
 
     /**
      * Keys are displayed in a natural looking way, like "→" for "RIGHT"
      */
-    static final CharDisplayMap classicArrowsDisplay = new CharDisplayMap() {{
+    private static final CharDisplayMap classicArrowsDisplay = new CharDisplayMap() {{
         // classic arrow keys (for ◀ ▶ ▲ ▼ @see arrowVariationDisplay)
         put("LEFT", "←"); // U+2190 ← LEFTWARDS ARROW
         put("RIGHT", "→"); // U+2192 → RIGHTWARDS ARROW
         put("UP", "↑"); // U+2191 ↑ UPWARDS ARROW
         put("DOWN", "↓"); // U+2193 ↓ DOWNWARDS ARROW
     }};
-    static final CharDisplayMap wellKnownCharactersDisplay = new CharDisplayMap() {{
+    private static final CharDisplayMap wellKnownCharactersDisplay = new CharDisplayMap() {{
         // well known characters // https://en.wikipedia.org/wiki/{Enter_key, Tab_key, Delete_key}
         put("ENTER", "↲"); // U+21B2 ↲ DOWNWARDS ARROW WITH TIP LEFTWARDS
         put("TAB", "↹"); // U+21B9 ↹ LEFTWARDS ARROW TO BAR OVER RIGHTWARDS ARROW TO BAR
@@ -31,7 +31,7 @@ public class ExtraKeysInfos {
         put("DRAWER", "☰"); // U+2630 ☰ TRIGRAM FOR HEAVEN not well known but easy to understand
         put("KEYBOARD", "⌨"); // U+2328 ⌨ KEYBOARD not well known but easy to understand
     }};
-    static final CharDisplayMap lessKnownCharactersDisplay = new CharDisplayMap() {{
+    private static final CharDisplayMap lessKnownCharactersDisplay = new CharDisplayMap() {{
         // https://en.wikipedia.org/wiki/{Home_key, End_key, Page_Up_and_Page_Down_keys}
         // home key can mean "goto the beginning of line" or "goto first page" depending on context, hence the diagonal
         put("HOME", "⇱"); // from IEC 9995 // U+21F1 ⇱ NORTH WEST ARROW TO CORNER
@@ -46,14 +46,14 @@ public class ExtraKeysInfos {
         put("UP", "▲"); // U+25B2 ▲ BLACK UP-POINTING TRIANGLE
         put("DOWN", "▼"); // U+25BC ▼ BLACK DOWN-POINTING TRIANGLE
     }};
-    static final CharDisplayMap notKnownIsoCharacters = new CharDisplayMap() {{
+    private static final CharDisplayMap notKnownIsoCharacters = new CharDisplayMap() {{
         // Control chars that are more clear as text // https://en.wikipedia.org/wiki/{Function_key, Alt_key, Control_key, Esc_key}
         // put("FN", "FN"); // no ISO character exists
         put("CTRL", "⎈"); // ISO character "U+2388 ⎈ HELM SYMBOL" is unknown to people and never printed on computers, however "U+25C7 ◇ WHITE DIAMOND" is a nice presentation, and "^" for terminal app and mac is often used
         put("ALT", "⎇"); // ISO character "U+2387 ⎇ ALTERNATIVE KEY SYMBOL'" is unknown to people and only printed as the Option key "⌥" on Mac computer
         put("ESC", "⎋"); // ISO character "U+238B ⎋ BROKEN CIRCLE WITH NORTHWEST ARROW" is unknown to people and not often printed on computers
     }};
-    static final CharDisplayMap nicerLookingDisplay = new CharDisplayMap() {{
+    private static final CharDisplayMap nicerLookingDisplay = new CharDisplayMap() {{
         // nicer looking for most cases
         put("-", "―"); // U+2015 ― HORIZONTAL BAR
     }};
@@ -212,7 +212,7 @@ public class ExtraKeysInfos {
         return buttons;
     }
 
-    CharDisplayMap getSelectedCharMap() {
+    private CharDisplayMap getSelectedCharMap() {
         switch (style) {
             case "arrows-only":
                 return arrowsOnlyCharDisplay;

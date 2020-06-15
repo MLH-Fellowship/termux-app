@@ -54,37 +54,40 @@ public final class TerminalView extends View {
      * Log view key and IME events.
      */
     private static final boolean LOG_KEY_EVENTS = false;
-    final int[] mTempCoords = new int[2];
-    final GestureAndScaleRecognizer mGestureRecognizer;
-    final Scroller mScroller;
+    private final int[] mTempCoords = new int[2];
+    private final GestureAndScaleRecognizer mGestureRecognizer;
+    private final Scroller mScroller;
     /**
      * The currently displayed terminal session, whose emulator is {@link #mEmulator}.
      */
-    TerminalSession mTermSession;
+    private TerminalSession mTermSession;
     /**
      * Our terminal emulator whose session is {@link #mTermSession}.
      */
-    TerminalEmulator mEmulator;
-    TerminalRenderer mRenderer;
-    TerminalViewClient mClient;
+    private TerminalEmulator mEmulator;
+    private TerminalRenderer mRenderer;
+    private TerminalViewClient mClient;
     /**
      * The top row of text to display. Ranges from -activeTranscriptRows to 0.
      */
-    int mTopRow;
-    boolean mIsSelectingText = false;
-    int mSelX1 = -1, mSelX2 = -1, mSelY1 = -1, mSelY2 = -1;
-    Drawable mSelectHandleLeft;
-    Drawable mSelectHandleRight;
-    Rect mTempRect;
-    float mScaleFactor = 1.f;
+    private int mTopRow;
+    private boolean mIsSelectingText = false;
+    private int mSelX1 = -1;
+    private int mSelX2 = -1;
+    private int mSelY1 = -1;
+    private int mSelY2 = -1;
+    private Drawable mSelectHandleLeft;
+    private Drawable mSelectHandleRight;
+    private Rect mTempRect;
+    private float mScaleFactor = 1.f;
     /**
      * What was left in from scrolling movement.
      */
-    float mScrollRemainder;
+    private float mScrollRemainder;
     /**
      * If non-zero, this is the last unicode code point received if that was a combining character.
      */
-    int mCombiningAccent;
+    private int mCombiningAccent;
     private ActionMode mActionMode;
     private final Runnable mShowFloatingToolbar = new Runnable() {
         @Override
@@ -451,7 +454,7 @@ public final class TerminalView extends View {
     /**
      * Send a single mouse event code to the terminal.
      */
-    void sendMouseEventCode(MotionEvent e, int button, boolean pressed) {
+    private void sendMouseEventCode(MotionEvent e, int button, boolean pressed) {
         int x = (int) (e.getX() / mRenderer.mFontWidth) + 1;
         int y = (int) ((e.getY() - mRenderer.mFontLineSpacingAndAscent) / mRenderer.mFontLineSpacing) + 1;
         if (pressed && (button == TerminalEmulator.MOUSE_WHEELDOWN_BUTTON || button == TerminalEmulator.MOUSE_WHEELUP_BUTTON)) {
@@ -470,7 +473,7 @@ public final class TerminalView extends View {
     /**
      * Perform a scroll, either from dragging the screen or by scrolling a mouse wheel.
      */
-    void doScroll(MotionEvent event, int rowsDown) {
+    private void doScroll(MotionEvent event, int rowsDown) {
         boolean up = rowsDown < 0;
         int amount = Math.abs(rowsDown);
         for (int i = 0; i < amount; i++) {
@@ -691,7 +694,7 @@ public final class TerminalView extends View {
     /**
      * Input the specified keyCode if applicable and return if the input was consumed.
      */
-    public boolean handleKeyCode(int keyCode, int keyMod) {
+    private boolean handleKeyCode(int keyCode, int keyMod) {
         TerminalEmulator term = mTermSession.getEmulator();
         String code = KeyHandler.getCode(keyCode, keyMod, term.isCursorKeysApplicationMode(), term.isKeypadApplicationMode());
         if (code == null) return false;
@@ -735,7 +738,7 @@ public final class TerminalView extends View {
     /**
      * Check if the terminal size in rows and columns should be updated.
      */
-    public void updateSize() {
+    private void updateSize() {
         int viewWidth = getWidth();
         int viewHeight = getHeight();
         if (viewWidth == 0 || viewHeight == 0 || mTermSession == null) return;
@@ -773,7 +776,7 @@ public final class TerminalView extends View {
      * Toggle text selection mode in the view.
      */
     @TargetApi(23)
-    public void startSelectingText(MotionEvent ev) {
+    private void startSelectingText(MotionEvent ev) {
         int cx = (int) (ev.getX() / mRenderer.mFontWidth);
         final boolean eventFromMouse = ev.isFromSource(InputDevice.SOURCE_MOUSE);
         // Offset for finger:
@@ -842,7 +845,7 @@ public final class TerminalView extends View {
         return Math.round((cy - mTopRow) * mRenderer.mFontLineSpacing);
     }
 
-    SelectionModifierCursorController getSelectionController() {
+    private SelectionModifierCursorController getSelectionController() {
         if (mSelectionModifierCursorController == null) {
             mSelectionModifierCursorController = new SelectionModifierCursorController();
 
@@ -887,10 +890,10 @@ public final class TerminalView extends View {
         }
     }
 
-    void hideFloatingToolbar(int duration) {
+    private void hideFloatingToolbar() {
         if (mActionMode != null) {
             removeCallbacks(mShowFloatingToolbar);
-            mActionMode.hide(duration);
+            mActionMode.hide(-1);
         }
     }
 
@@ -905,7 +908,7 @@ public final class TerminalView extends View {
         if (mActionMode != null) {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_MOVE:
-                    hideFloatingToolbar(-1);
+                    hideFloatingToolbar();
                     break;
                 case MotionEvent.ACTION_UP:  // fall through
                 case MotionEvent.ACTION_CANCEL:
@@ -960,8 +963,8 @@ public final class TerminalView extends View {
     }
 
     private class HandleView extends View {
-        public static final int LEFT = 0;
-        public static final int RIGHT = 2;
+        static final int LEFT = 0;
+        static final int RIGHT = 2;
         private final int mOrigOrient;
         int mHandleWidth;
         private Drawable mDrawable;
@@ -982,7 +985,7 @@ public final class TerminalView extends View {
 
         private long mLastTime;
 
-        public HandleView(CursorController controller, int orientation) {
+        HandleView(CursorController controller, int orientation) {
             super(TerminalView.this.getContext());
             mController = controller;
             mContainer = new PopupWindow(TerminalView.this.getContext(), null,
@@ -997,7 +1000,7 @@ public final class TerminalView extends View {
             setOrientation(orientation);
         }
 
-        public void setOrientation(int orientation) {
+        void setOrientation(int orientation) {
             mOrientation = orientation;
             int handleWidth = 0;
             switch (orientation) {
@@ -1035,7 +1038,7 @@ public final class TerminalView extends View {
             invalidate();
         }
 
-        public void changeOrientation(int orientation) {
+        void changeOrientation(int orientation) {
             if (mOrientation != orientation) {
                 setOrientation(orientation);
             }
@@ -1047,7 +1050,7 @@ public final class TerminalView extends View {
                 mDrawable.getIntrinsicHeight());
         }
 
-        public void show() {
+        void show() {
             if (!isPositionVisible()) {
                 hide();
                 return;
@@ -1060,12 +1063,12 @@ public final class TerminalView extends View {
             mContainer.showAtLocation(TerminalView.this, 0, coords[0], coords[1]);
         }
 
-        public void hide() {
+        void hide() {
             mIsDragging = false;
             mContainer.dismiss();
         }
 
-        public boolean isShowing() {
+        boolean isShowing() {
             return mContainer.isShowing();
         }
 
@@ -1228,7 +1231,7 @@ public final class TerminalView extends View {
         }
 
 
-        public boolean isDragging() {
+        boolean isDragging() {
             return mIsDragging;
         }
 

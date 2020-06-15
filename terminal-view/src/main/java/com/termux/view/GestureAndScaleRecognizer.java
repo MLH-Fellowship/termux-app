@@ -10,10 +10,10 @@ import android.view.ScaleGestureDetector;
  */
 final class GestureAndScaleRecognizer {
 
-    final Listener mListener;
+    private final Listener mListener;
     private final GestureDetector mGestureDetector;
     private final ScaleGestureDetector mScaleDetector;
-    boolean isAfterLongPress;
+    private boolean isAfterLongPress;
 
     public GestureAndScaleRecognizer(Context context, Listener listener) {
         mListener = listener;

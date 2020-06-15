@@ -30,10 +30,10 @@ import java.util.Properties;
  */
 public class RunCommandService extends Service {
 
-    public static final String RUN_COMMAND_ACTION = "com.termux.RUN_COMMAND";
-    public static final String RUN_COMMAND_PATH = "com.termux.RUN_COMMAND_PATH";
-    public static final String RUN_COMMAND_ARGUMENTS = "com.termux.RUN_COMMAND_ARGUMENTS";
-    public static final String RUN_COMMAND_WORKDIR = "com.termux.RUN_COMMAND_WORKDIR";
+    private static final String RUN_COMMAND_ACTION = "com.termux.RUN_COMMAND";
+    private static final String RUN_COMMAND_PATH = "com.termux.RUN_COMMAND_PATH";
+    private static final String RUN_COMMAND_ARGUMENTS = "com.termux.RUN_COMMAND_ARGUMENTS";
+    private static final String RUN_COMMAND_WORKDIR = "com.termux.RUN_COMMAND_WORKDIR";
     private final IBinder mBinder = new RunCommandService.LocalBinder();
 
     @Override

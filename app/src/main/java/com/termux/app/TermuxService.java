@@ -69,8 +69,8 @@ public final class TermuxService extends Service implements SessionChangedCallba
      * Note that this list is observed by {@link TermuxActivity#mListViewAdapter}, so any changes must be made on the UI
      * thread and followed by a call to {@link ArrayAdapter#notifyDataSetChanged()} }.
      */
-    final List<TerminalSession> mTerminalSessions = new ArrayList<>();
-    final List<BackgroundJob> mBackgroundTasks = new ArrayList<>();
+    private final List<TerminalSession> mTerminalSessions = new ArrayList<>();
+    private final List<BackgroundJob> mBackgroundTasks = new ArrayList<>();
     private final IBinder mBinder = new LocalBinder();
     private final Handler mHandler = new Handler();
     /**
@@ -87,7 +87,7 @@ public final class TermuxService extends Service implements SessionChangedCallba
     private PowerManager.WakeLock mWakeLock;
     private WifiManager.WifiLock mWifiLock;
 
-    @SuppressLint("Wakelock")
+    @SuppressLint({"Wakelock", "BatteryLife", "InvalidWakeLockTag"})
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
@@ -100,7 +100,7 @@ public final class TermuxService extends Service implements SessionChangedCallba
             if (mWakeLock == null) {
                 PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
                 mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, EmulatorDebug.LOG_TAG);
-                mWakeLock.acquire();
+                mWakeLock.acquire(10*60*1000L /*10 minutes*/);
 
                 // http://tools.android.com/tech-docs/lint-in-studio-2-3#TOC-WifiManager-Leak
                 WifiManager wm = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -185,7 +185,7 @@ public final class TermuxService extends Service implements SessionChangedCallba
     /**
      * Update the shown foreground service notification after making any changes that affect it.
      */
-    void updateNotification() {
+    private void updateNotification() {
         if (mWakeLock == null && mTerminalSessions.isEmpty() && mBackgroundTasks.isEmpty()) {
             // Exit if we are updating after the user disabled all locks with no sessions or tasks running.
             stopSelf();

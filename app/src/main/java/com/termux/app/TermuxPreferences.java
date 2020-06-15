@@ -73,14 +73,14 @@ final class TermuxPreferences {
         } catch (NumberFormatException | ClassCastException e) {
             mFontSize = defaultFontSize;
         }
-        mFontSize = clamp(mFontSize, MIN_FONTSIZE, MAX_FONTSIZE);
+        mFontSize = clamp(mFontSize, MIN_FONTSIZE);
     }
 
     /**
      * If value is not in the range [min, max], set it to either min or max.
      */
-    static int clamp(int value, int min, int max) {
-        return Math.min(Math.max(value, min), max);
+    private static int clamp(int value, int min) {
+        return Math.min(Math.max(value, min), TermuxPreferences.MAX_FONTSIZE);
     }
 
     static void storeCurrentSession(Context context, TerminalSession session) {
@@ -222,7 +222,7 @@ final class TermuxPreferences {
 
     @IntDef({BELL_VIBRATE, BELL_BEEP, BELL_IGNORE})
     @Retention(RetentionPolicy.SOURCE)
-    @interface AsciiBellBehaviour {
+    private @interface AsciiBellBehaviour {
     }
 
     final static class KeyboardShortcut {

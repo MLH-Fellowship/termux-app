@@ -96,7 +96,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     private static final int REQUESTCODE_PERMISSION_STORAGE = 1234;
 
     private static final String RELOAD_STYLE_ACTION = "com.termux.app.reload_style";
-    final SoundPool mBellSoundPool = new SoundPool.Builder().setMaxStreams(1).setAudioAttributes(
+    private final SoundPool mBellSoundPool = new SoundPool.Builder().setMaxStreams(1).setAudioAttributes(
         new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION).build()).build();
     /**
@@ -116,16 +116,16 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     /**
      * Initialized in {@link #onServiceConnected(ComponentName, IBinder)}.
      */
-    ArrayAdapter<TerminalSession> mListViewAdapter;
+    private ArrayAdapter<TerminalSession> mListViewAdapter;
     /**
      * The last toast shown, used cancel current toast before showing new in {@link #showToast(String, boolean)}.
      */
-    Toast mLastToast;
+    private Toast mLastToast;
     /**
      * If between onResume() and onStop(). Note that only one session is in the foreground of the terminal view at the
      * time, so if the session causing a change is not in the foreground it should probably be treated as background.
      */
-    boolean mIsVisible;
+    private boolean mIsVisible;
     private final BroadcastReceiver mBroadcastReceiever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -145,8 +145,8 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
         }
     };
-    boolean mIsUsingBlackUI;
-    int mBellSoundId;
+    private boolean mIsUsingBlackUI;
+    private int mBellSoundId;
 
     static LinkedHashSet<CharSequence> extractUrls(String text) {
 
@@ -235,7 +235,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         return urlSet;
     }
 
-    void checkForFontAndColors() {
+    private void checkForFontAndColors() {
         try {
             @SuppressLint("SdCardPath") File fontFile = new File("/data/data/com.termux/files/home/.termux/font.ttf");
             @SuppressLint("SdCardPath") File colorsFile = new File("/data/data/com.termux/files/home/.termux/colors.properties");
@@ -261,7 +261,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
     }
 
-    void updateBackgroundColor() {
+    private void updateBackgroundColor() {
         TerminalSession session = getCurrentTermSession();
         if (session != null && session.getEmulator() != null) {
             getWindow().getDecorView().setBackgroundColor(session.getEmulator().mColors.mCurrentColors[TextStyle.COLOR_INDEX_BACKGROUND]);
@@ -271,7 +271,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     /**
      * For processes to access shared internal storage (/sdcard) we need this permission.
      */
-    public boolean ensureStoragePermissionGranted() {
+    private boolean ensureStoragePermissionGranted() {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {
@@ -707,7 +707,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         }
     }
 
-    String toToastTitle(TerminalSession session) {
+    private String toToastTitle(TerminalSession session) {
         final int indexOfSession = mTermService.getSessions().indexOf(session);
         StringBuilder toastTitle = new StringBuilder("[" + (indexOfSession + 1) + "]");
         if (!TextUtils.isEmpty(session.mSessionName)) {
@@ -722,7 +722,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         return toastTitle.toString();
     }
 
-    void noteSessionInfo() {
+    private void noteSessionInfo() {
         if (!mIsVisible) return;
         TerminalSession session = getCurrentTermSession();
         final int indexOfSession = mTermService.getSessions().indexOf(session);
@@ -899,7 +899,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     /**
      * The current session as stored or the last one if that does not exist.
      */
-    public TerminalSession getStoredCurrentSessionOrLast() {
+    private TerminalSession getStoredCurrentSessionOrLast() {
         TerminalSession stored = TermuxPreferences.getCurrentSession(this);
         if (stored != null) return stored;
         List<TerminalSession> sessions = mTermService.getSessions();
@@ -909,7 +909,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     /**
      * Show a toast and dismiss the last one if still visible.
      */
-    void showToast(String text, boolean longDuration) {
+    private void showToast(String text, boolean longDuration) {
         if (mLastToast != null) mLastToast.cancel();
         mLastToast = Toast.makeText(TermuxActivity.this, text, longDuration ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
         mLastToast.setGravity(Gravity.TOP, 0, 0);

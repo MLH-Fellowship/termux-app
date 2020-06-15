@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
  */
 public final class TermuxHelpActivity extends AppCompatActivity {
 
-    WebView mWebView;
+    private WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

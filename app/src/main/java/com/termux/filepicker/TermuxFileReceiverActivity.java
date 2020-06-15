@@ -26,9 +26,9 @@ import java.util.regex.Pattern;
 
 public class TermuxFileReceiverActivity extends AppCompatActivity {
 
-    static final String TERMUX_RECEIVEDIR = TermuxService.FILES_PATH + "/home/downloads";
-    static final String EDITOR_PROGRAM = TermuxService.HOME_PATH + "/bin/termux-file-editor";
-    static final String URL_OPENER_PROGRAM = TermuxService.HOME_PATH + "/bin/termux-url-opener";
+    private static final String TERMUX_RECEIVEDIR = TermuxService.FILES_PATH + "/home/downloads";
+    private static final String EDITOR_PROGRAM = TermuxService.HOME_PATH + "/bin/termux-file-editor";
+    private static final String URL_OPENER_PROGRAM = TermuxService.HOME_PATH + "/bin/termux-url-opener";
 
     /**
      * If the activity should be finished when the name input dialog is dismissed. This is disabled
@@ -36,7 +36,7 @@ public class TermuxFileReceiverActivity extends AppCompatActivity {
      * name input dialog to be implicitly dismissed, and we do not want to finish the activity directly
      * when showing the error dialog.
      */
-    boolean mFinishOnDismissNameDialog = true;
+    private boolean mFinishOnDismissNameDialog = true;
 
     static boolean isSharedTextAnUrl(String sharedText) {
         return Patterns.WEB_URL.matcher(sharedText).matches()
@@ -87,12 +87,12 @@ public class TermuxFileReceiverActivity extends AppCompatActivity {
         }
     }
 
-    void showErrorDialogAndQuit(String message) {
+    private void showErrorDialogAndQuit(String message) {
         mFinishOnDismissNameDialog = false;
         new AlertDialog.Builder(this).setMessage(message).setOnDismissListener(dialog -> finish()).setPositiveButton(android.R.string.ok, (dialog, which) -> finish()).show();
     }
 
-    void handleContentUri(final Uri uri, String subjectFromIntent) {
+    private void handleContentUri(final Uri uri, String subjectFromIntent) {
         try {
             String attachmentFileName = null;
 
@@ -114,7 +114,7 @@ public class TermuxFileReceiverActivity extends AppCompatActivity {
         }
     }
 
-    void promptNameAndSave(final InputStream in, final String attachmentFileName) {
+    private void promptNameAndSave(final InputStream in, final String attachmentFileName) {
         DialogUtils.textInput(this, R.string.file_received_title, attachmentFileName, R.string.file_received_edit_button, text -> {
                 File outFile = saveStreamWithName(in, text);
                 if (outFile == null) return;
@@ -152,7 +152,7 @@ public class TermuxFileReceiverActivity extends AppCompatActivity {
             });
     }
 
-    public File saveStreamWithName(InputStream in, String attachmentFileName) {
+    private File saveStreamWithName(InputStream in, String attachmentFileName) {
         File receiveDir = new File(TERMUX_RECEIVEDIR);
         if (!receiveDir.isDirectory() && !receiveDir.mkdirs()) {
             showErrorDialogAndQuit("Cannot create directory: " + receiveDir.getAbsolutePath());
@@ -175,7 +175,7 @@ public class TermuxFileReceiverActivity extends AppCompatActivity {
         }
     }
 
-    void handleUrlAndFinish(final String url) {
+    private void handleUrlAndFinish(final String url) {
         final File urlOpenerProgramFile = new File(URL_OPENER_PROGRAM);
         if (!urlOpenerProgramFile.isFile()) {
             showErrorDialogAndQuit("The following file does not exist:\n$HOME/bin/termux-url-opener\n\n"

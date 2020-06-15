@@ -29,7 +29,7 @@ public final class TerminalRow {
     /**
      * If this row might contain chars with width != 1, used for deactivating fast path
      */
-    boolean mHasNonOneWidthOrSurrogateChars;
+    private boolean mHasNonOneWidthOrSurrogateChars;
     /**
      * The number of java char:s used in {@link #mText}.
      */

@@ -12,4 +12,5 @@
     android:textColor="@android:color/white"
     android:textColorHighlight="@android:color/darker_gray"
     android:textCursorDrawable="@null"
-    tools:ignore="LabelFor" />
+    tools:ignore="LabelFor"
+    android:importantForAutofill="no" />

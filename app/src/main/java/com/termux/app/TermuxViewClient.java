@@ -19,12 +19,13 @@ import java.util.List;
 
 public final class TermuxViewClient implements TerminalViewClient {
 
-    final TermuxActivity mActivity;
+    private final TermuxActivity mActivity;
 
     /**
      * Keeping track of the special keys acting as Ctrl and Fn for the soft keyboard and other hardware keys.
      */
-    boolean mVirtualControlKeyDown, mVirtualFnKeyDown;
+    private boolean mVirtualControlKeyDown;
+    private boolean mVirtualFnKeyDown;
 
     public TermuxViewClient(TermuxActivity activity) {
         this.mActivity = activity;

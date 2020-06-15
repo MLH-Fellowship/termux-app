@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class ExtraKeysView extends GridLayout {
 
-    static final Map<String, Integer> keyCodesForString = new HashMap<String, Integer>() {{
+    private static final Map<String, Integer> keyCodesForString = new HashMap<String, Integer>() {{
         put("SPACE", KeyEvent.KEYCODE_SPACE);
         put("ESC", KeyEvent.KEYCODE_ESCAPE);
         put("TAB", KeyEvent.KEYCODE_TAB);
@@ -83,7 +83,7 @@ public final class ExtraKeysView extends GridLayout {
     /**
      * General util function to compute the longest column length in a matrix.
      */
-    static int maximumLength(Object[][] matrix) {
+    private static int maximumLength(Object[][] matrix) {
         int m = 0;
         for (Object[] row : matrix)
             m = Math.max(m, row.length);
@@ -161,7 +161,7 @@ public final class ExtraKeysView extends GridLayout {
         return true;
     }
 
-    void popup(View view, String text) {
+    private void popup(View view, String text) {
         int width = view.getMeasuredWidth();
         int height = view.getMeasuredHeight();
         Button button = new Button(getContext(), null, android.R.attr.buttonBarButtonStyle);

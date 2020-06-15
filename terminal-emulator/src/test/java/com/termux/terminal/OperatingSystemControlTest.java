@@ -102,7 +102,7 @@ public class OperatingSystemControlTest extends TerminalTestCase {
         assertEquals(mTerminal.mColors.mCurrentColors[8], 0xFF0000FF);
     }
 
-    void assertIndexColorsMatch(int[] expected) {
+    private void assertIndexColorsMatch(int[] expected) {
         for (int i = 0; i < 255; i++)
             assertEquals("index=" + i, expected[i], mTerminal.mColors.mCurrentColors[i]);
     }

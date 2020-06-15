@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * A background job launched by Termux.
  */
-public final class BackgroundJob {
+final class BackgroundJob {
 
     private static final String LOG_TAG = "termux-task";
 

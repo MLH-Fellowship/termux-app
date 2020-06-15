@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 
-public class TermuxActivityTest {
+class TermuxActivityTest {
 
     private void assertUrlsAre(String text, String... urls) {
         LinkedHashSet<String> expected = new LinkedHashSet<>();

@@ -1,9 +1,12 @@
+import java.security.DigestInputStream
+import java.security.MessageDigest
+
 plugins {
     id "com.android.application"
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     ndkVersion '21.2.6472646'
 
     dependencies {
@@ -16,7 +19,7 @@ android {
     defaultConfig {
         applicationId "com.termux"
         minSdkVersion 24
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 95
         versionName "0.95"
 
@@ -84,7 +87,7 @@ task versionName {
 }
 
 def downloadBootstrap(String arch, String expectedChecksum, int version) {
-    def digest = java.security.MessageDigest.getInstance("SHA-256")
+    def digest = MessageDigest.getInstance("SHA-256")
 
     def localUrl = "src/main/cpp/bootstrap-" + arch + ".zip"
     def file = new File(projectDir, localUrl)
@@ -113,7 +116,7 @@ def downloadBootstrap(String arch, String expectedChecksum, int version) {
 
     def connection = new URL(remoteUrl).openConnection()
     connection.setInstanceFollowRedirects(true)
-    def digestStream = new java.security.DigestInputStream(connection.inputStream, digest)
+    def digestStream = new DigestInputStream(connection.inputStream, digest)
     out << digestStream
     out.close()
 

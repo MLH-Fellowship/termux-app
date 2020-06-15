@@ -38,16 +38,16 @@ public final class TerminalSession extends TerminalOutput {
      * A queue written to from a separate thread when the process outputs, and read by main thread to process by
      * terminal emulator.
      */
-    final ByteQueue mProcessToTerminalIOQueue = new ByteQueue(4096);
+    private final ByteQueue mProcessToTerminalIOQueue = new ByteQueue(4096);
     /**
      * A queue written to from the main thread due to user interaction, and read by another thread which forwards by
      * writing to the {@link #mTerminalFileDescriptor}.
      */
-    final ByteQueue mTerminalToProcessIOQueue = new ByteQueue(4096);
+    private final ByteQueue mTerminalToProcessIOQueue = new ByteQueue(4096);
     /**
      * Callback which gets notified when a session finishes or changes title.
      */
-    final SessionChangedCallback mChangeCallback;
+    private final SessionChangedCallback mChangeCallback;
     /**
      * Buffer to write translate code points into utf8 before writing to mTerminalToProcessIOQueue
      */
@@ -60,22 +60,22 @@ public final class TerminalSession extends TerminalOutput {
      * Set by the application for user identification of session, not by terminal.
      */
     public String mSessionName;
-    TerminalEmulator mEmulator;
+    private TerminalEmulator mEmulator;
     /**
      * The pid of the shell process. 0 if not started and -1 if finished running.
      */
-    int mShellPid;
+    private int mShellPid;
     /**
      * The exit status of the shell process. Only valid if ${@link #mShellPid} is -1.
      */
-    int mShellExitStatus;
+    private int mShellExitStatus;
     /**
      * The file descriptor referencing the master half of a pseudo-terminal pair, resulting from calling
      * {@link JNI#createSubprocess(String, String, String[], String[], int[], int, int)}.
      */
     private int mTerminalFileDescriptor;
     @SuppressLint("HandlerLeak")
-    final Handler mMainThreadHandler = new Handler() {
+    private final Handler mMainThreadHandler = new Handler() {
         final byte[] mReceiveBuffer = new byte[4 * 1024];
 
         @Override
@@ -161,7 +161,7 @@ public final class TerminalSession extends TerminalOutput {
      * @param columns The number of columns in the terminal window.
      * @param rows    The number of rows in the terminal window.
      */
-    public void initializeEmulator(int columns, int rows) {
+    private void initializeEmulator(int columns, int rows) {
         mEmulator = new TerminalEmulator(this, columns, rows, /* transcript= */2000);
 
         int[] processId = new int[1];
@@ -267,7 +267,7 @@ public final class TerminalSession extends TerminalOutput {
     /**
      * Notify the {@link #mChangeCallback} that the screen has changed.
      */
-    protected void notifyScreenUpdate() {
+    private void notifyScreenUpdate() {
         mChangeCallback.onTextChanged(this);
     }
 
@@ -295,7 +295,7 @@ public final class TerminalSession extends TerminalOutput {
     /**
      * Cleanup resources when the process exits.
      */
-    void cleanupResources(int exitStatus) {
+    private void cleanupResources(int exitStatus) {
         synchronized (this) {
             mShellPid = -1;
             mShellExitStatus = exitStatus;

@@ -9,7 +9,7 @@ import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 
 /** A combination of [GestureDetector] and [ScaleGestureDetector].  */
-internal class GestureAndScaleRecognizer(
+class GestureAndScaleRecognizer(
     context: Context?,
     val mListener: Listener
 ) {
